@@ -5,6 +5,7 @@
 ## Quick Start
 
 ```console
+$ nix-shell         # Only if you are on NixOS
 $ make
 $ feh output.png
 ```
