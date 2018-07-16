@@ -1,3 +1,11 @@
+all: output.png
+
+output.png: output.ppm
+	convert output.ppm output.png
+
+output.ppm: ray-tracer
+	./ray-tracer
+
 ray-tracer: main.cpp Makefile
 	g++ -ggdb -Wall -Werror -Wconversion -std=c++14 main.cpp -o ray-tracer
 
