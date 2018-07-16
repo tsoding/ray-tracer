@@ -82,7 +82,7 @@ color march(float x, float y, const Scene &scene)
     const vec3<float> sphereCenter = {0.0f, 0.0f, scene.sphereZ};
     vec3<float> ray = {x, y, 0.0f};
 
-    while (ray.v[Z] <= scene.lightZ) {
+    while (ray.v[2] <= scene.lightZ) {
         ray += dir;
         if(sqr_norm(sphereCenter - ray) <= scene.sphereR * scene.sphereR) {
             return {0U, 0U, 0U};
