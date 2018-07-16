@@ -99,7 +99,7 @@ void render_scene(color *display, size_t width, size_t height,
     const float half_height = static_cast<float>(height) * 0.5f;
 
     for (size_t row = 0; row < height; ++row) {
-        std::cout << row << std::endl;
+        std::cout << "Row " << row << std::endl;
         for (size_t col = 0; col < width; ++col) {
             display[row * width + col] =
                 march(static_cast<float>(col) - half_width,
