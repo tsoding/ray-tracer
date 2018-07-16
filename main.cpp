@@ -6,10 +6,6 @@
 #include <fstream>
 #include <string>
 
-#define X 0
-#define Y 1
-#define Z 2
-
 template <typename T>
 struct vec3
 {
