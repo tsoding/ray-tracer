@@ -6,6 +6,5 @@
 
 ```console
 $ make
-$ ./ray-tracer
-$ feh output.ppm
+$ feh output.png
 ```
