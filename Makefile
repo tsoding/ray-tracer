@@ -6,7 +6,7 @@ output.png: output.ppm
 output.ppm: ray-tracer
 	./ray-tracer
 
-ray-tracer: main.cpp Makefile
+ray-tracer: main.cpp vec.hpp Makefile
 	g++ -ggdb -Wall -Werror -Wconversion -std=c++14 main.cpp -o ray-tracer
 
 .PHONY: clean

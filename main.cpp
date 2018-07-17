@@ -6,47 +6,12 @@
 #include <fstream>
 #include <string>
 
+#include "vec.hpp"
+
 template <typename T>
-struct vec3
-{
-    T v[3];
-};
+using vec3 = vec<T, 3>;
 
 using color = vec3<uint8_t>;
-
-template <typename T>
-vec3<T> operator+(const vec3<T> &v1, const vec3<T> &v2)
-{
-    return {
-        v1.v[0] + v2.v[0],
-        v1.v[1] + v2.v[1],
-        v1.v[2] + v2.v[2]
-    };
-}
-
-template <typename T>
-vec3<T> operator-(const vec3<T> &v1, const vec3<T> &v2)
-{
-    return {
-        v1.v[0] - v2.v[0],
-        v1.v[1] - v2.v[1],
-        v1.v[2] - v2.v[2]
-    };
-}
-
-template <typename T>
-vec3<T> &operator+=(vec3<T> &v1, const vec3<T> &v2)
-{
-    v1.v[0] += v2.v[0];
-    v1.v[1] += v2.v[1];
-    v1.v[2] += v2.v[2];
-    return v1;
-}
-
-float sqr_norm(const vec3<float> &v)
-{
-    return v.v[0] * v.v[0] + v.v[1] * v.v[1] + v.v[2] * v.v[2];
-}
 
 struct Scene
 {
