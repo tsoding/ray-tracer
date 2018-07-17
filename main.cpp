@@ -13,13 +13,25 @@ using vec3 = vec<T, 3>;
 
 using color = vec3<uint8_t>;
 
+using plane = vec<float, 4>;
+
+struct Wall
+{
+    plane p;
+    color c;
+};
+
 struct Scene
 {
     float sphereZ;
     float sphereR;
-    float lightZ;
-    color lightColor;
+    Wall wall;
 };
+
+float f(const plane &p, const vec3<float> &v)
+{
+    return p.v[0] * v.v[0] + p.v[1] * v.v[1] + p.v[2] * v.v[2] + p.v[3];
+}
 
 void save_display_to_file(const color *display,
                           size_t width,
@@ -47,14 +59,14 @@ color march(float x, float y, const Scene &scene)
     const vec3<float> sphereCenter = {0.0f, 0.0f, scene.sphereZ};
     vec3<float> ray = {x, y, 0.0f};
 
-    while (ray.v[2] <= scene.lightZ) {
+    while (std::abs(f(scene.wall.p, ray)) > 1e-6) {
         ray += dir;
-        if(sqr_norm(sphereCenter - ray) <= scene.sphereR * scene.sphereR) {
+        if (sqr_norm(sphereCenter - ray) <= scene.sphereR * scene.sphereR) {
             return {0U, 0U, 0U};
         }
     }
 
-    return scene.lightColor;
+    return scene.wall.c;
 }
 
 void render_scene(color *display, size_t width, size_t height,
@@ -79,7 +91,14 @@ int main(int argc, char *argv[])
     const size_t width = 800, height = 600;
     std::array<color, width * height> display;
 
-    render_scene(display.data(), width, height, {200, 50, 300, {255, 255, 255}});
+    render_scene(display.data(), width, height, {
+            200,                  // sphereZ
+            50,                   // sphereR
+            {
+                { 0, 0, -1, 300 },    // wall
+                { 255, 255, 255 }     // wallColor
+            }
+        });
     save_display_to_file(display.data(), width, height, "output.ppm");
 
     return 0;
