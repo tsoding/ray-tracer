@@ -26,12 +26,22 @@ struct Scene
 {
     float sphereZ;
     float sphereR;
-    Wall wall;
+    std::vector<Wall> walls;
 };
 
 float dot(const plane &p, const vec3<float> &v)
 {
     return p.v[0] * v.v[0] + p.v[1] * v.v[1] + p.v[2] * v.v[2] + p.v[3];
+}
+
+float dot(const vec3<float> &v1, const vec3<float> &v2)
+{
+    return v1.v[0] * v2.v[0] + v1.v[1] * v2.v[1] + v1.v[2] * v2.v[2];
+}
+
+vec3<float> normalize(const vec3<float> &v)
+{
+    return 1.0f / sqrtf(sqr_norm(v)) * v;
 }
 
 void save_display_to_file(const color *display,
@@ -56,18 +66,31 @@ void save_display_to_file(const color *display,
 
 color march(float x, float y, const Scene &scene)
 {
-    const vec3<float> dir = {0.0f, 0.0f, 1.0f};
+    vec3<float> dir = {0.0f, 0.0f, 1.0f};
     const vec3<float> sphereCenter = {0.0f, 0.0f, scene.sphereZ};
     vec3<float> ray = {x, y, 0.0f};
+    size_t step_count = 5000;
 
-    while (std::abs(dot(scene.wall.p, ray)) > 1e-6) {
+    for (size_t i = 0; i < step_count; ++i) {
         ray += dir;
+
         if (sqr_norm(sphereCenter - ray) <= scene.sphereR * scene.sphereR) {
-            return {0U, 0U, 0U};
+            vec3<float> norm = ray - sphereCenter;
+            dir = normalize(dir - (2 * dot(ray, norm)) * norm);
+            // std::cout << dir.v[0] << " "
+            //           << dir.v[1] << " "
+            //           << dir.v[2] << " "
+            //           << std::endl;
+        }
+
+        for (const auto &wall: scene.walls) {
+            if (std::abs(dot(wall.p, ray)) <= 0.5f) {
+                return wall.c;
+            }
         }
     }
 
-    return scene.wall.c;
+    return {0U, 0U, 0U};
 }
 
 void render_scene(color *display, size_t width, size_t height,
@@ -94,10 +117,32 @@ int main(int argc, char *argv[])
 
     render_scene(display.data(), width, height, {
             200,                  // sphereZ
-            50,                   // sphereR
-            {
-                { 0, 0, -1, 300 },    // wall
-                { 255, 255, 255 }     // wallColor
+            100,                   // sphereR
+            {                     // walls
+                {
+                    { 0, 0, -1, 500 },    // p
+                    { 255, 255, 255 }     // c
+                },
+                {
+                    { 0, 0, 1, 500 },    // p
+                    { 255, 0, 0 }        // c
+                },
+                {
+                    { 1, 0, 0, 500 },    // p
+                    { 0, 255, 0 }        // c
+                },
+                {
+                    { -1, 0, 0, 500 },    // p
+                    { 0, 0, 255 }        // c
+                },
+                {
+                    { 0, 1, 0, 500 },    // p
+                    { 255, 255, 0 }        // c
+                },
+                {
+                    { 0, -1, 0, 500 },    // p
+                    { 255, 0, 255 }        // c
+                }
             }
         });
     save_display_to_file(display.data(), width, height, "output.ppm");

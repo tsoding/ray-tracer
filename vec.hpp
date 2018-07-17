@@ -42,6 +42,24 @@ vec<T, N> &operator+=(vec<T, N> &v1, const vec<T, N> &v2)
 }
 
 template <typename T, size_t N>
+vec<T, N> operator*(const T &s, const vec<T, N> &v)
+{
+    vec<T, N> result;
+
+    for (size_t i = 0; i < N; ++i) {
+        result.v[i] = v.v[i] * s;
+    }
+
+    return result;
+}
+
+template <typename T, size_t N>
+vec<T, N> operator*(const vec<T, N> &v, const T &s)
+{
+    return s * v;
+}
+
+template <typename T, size_t N>
 T sqr_norm(const vec<T, N> &v)
 {
     T acc = T();
