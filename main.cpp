@@ -1,10 +1,11 @@
 #include <cmath>
 #include <cstdint>
 
-#include <iostream>
 #include <array>
 #include <fstream>
+#include <iostream>
 #include <string>
+#include <vector>
 
 #include "vec.hpp"
 
@@ -28,7 +29,7 @@ struct Scene
     Wall wall;
 };
 
-float f(const plane &p, const vec3<float> &v)
+float dot(const plane &p, const vec3<float> &v)
 {
     return p.v[0] * v.v[0] + p.v[1] * v.v[1] + p.v[2] * v.v[2] + p.v[3];
 }
@@ -59,7 +60,7 @@ color march(float x, float y, const Scene &scene)
     const vec3<float> sphereCenter = {0.0f, 0.0f, scene.sphereZ};
     vec3<float> ray = {x, y, 0.0f};
 
-    while (std::abs(f(scene.wall.p, ray)) > 1e-6) {
+    while (std::abs(dot(scene.wall.p, ray)) > 1e-6) {
         ray += dir;
         if (sqr_norm(sphereCenter - ray) <= scene.sphereR * scene.sphereR) {
             return {0U, 0U, 0U};
