@@ -46,6 +46,7 @@ T sqr_norm(const vec<T, N> &v)
 {
     T acc = T();
 
+    // TODO: possible signed integer overflow
     for (size_t i = 0; i < N; ++i) {
         acc += v.v[i] * v.v[i];
     }
