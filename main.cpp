@@ -77,10 +77,6 @@ color march(float x, float y, const Scene &scene)
         if (sqr_norm(sphereCenter - ray) <= scene.sphereR * scene.sphereR) {
             vec3<float> norm = ray - sphereCenter;
             dir = normalize(dir - (2 * dot(ray, norm)) * norm);
-            // std::cout << dir.v[0] << " "
-            //           << dir.v[1] << " "
-            //           << dir.v[2] << " "
-            //           << std::endl;
         }
 
         for (const auto &wall: scene.walls) {
