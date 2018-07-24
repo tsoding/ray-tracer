@@ -22,10 +22,15 @@ struct Wall
     color c;
 };
 
+struct Sphere
+{
+    vec3<float> center;
+    float radius;
+};
+
 struct Scene
 {
-    float sphereZ;
-    float sphereR;
+    Sphere sphere;
     std::vector<Wall> walls;
 };
 
@@ -68,15 +73,14 @@ color march(float x, float y,
             const Scene &scene,
             vec3<float> dir)
 {
-    const vec3<float> sphereCenter = {0.0f, 0.0f, scene.sphereZ};
     vec3<float> ray = {x, y, 0.0f};
     size_t step_count = 5000;
 
     for (size_t i = 0; i < step_count; ++i) {
         ray += dir;
 
-        if (sqr_norm(sphereCenter - ray) <= scene.sphereR * scene.sphereR) {
-            vec3<float> norm = ray - sphereCenter;
+        if (sqr_norm(scene.sphere.center - ray) <= scene.sphere.radius * scene.sphere.radius) {
+            vec3<float> norm = ray - scene.sphere.center;
             dir = normalize(dir - (2 * dot(ray, norm)) * norm);
         }
 
@@ -96,7 +100,7 @@ void render_scene(color *display, size_t width, size_t height,
     const float half_width = static_cast<float>(width) * 0.5f;
     const float half_height = static_cast<float>(height) * 0.5f;
 
-    const vec3<float> eye{0.0f, 0.0f, -scene.sphereZ};
+    const vec3<float> eye{0.0f, 0.0f, -scene.sphere.center.v[2]};
 
     for (size_t row = 0; row < height; ++row) {
         std::cout << "Row " << row << std::endl;
@@ -120,8 +124,7 @@ int main(int argc, char *argv[])
     std::array<color, width * height> display;
 
     render_scene(display.data(), width, height, {
-            200,                  // sphereZ
-            100,                   // sphereR
+            { { -100.0f, 0.0f, 200.0f }, 100 }, // sphere
             {                     // walls
                 {
                     { 0, 0, -1, 500 },    // p
