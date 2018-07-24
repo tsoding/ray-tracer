@@ -64,9 +64,10 @@ void save_display_to_file(const color *display,
     }
 }
 
-color march(float x, float y, const Scene &scene)
+color march(float x, float y,
+            const Scene &scene,
+            vec3<float> dir)
 {
-    vec3<float> dir = {0.0f, 0.0f, 1.0f};
     const vec3<float> sphereCenter = {0.0f, 0.0f, scene.sphereZ};
     vec3<float> ray = {x, y, 0.0f};
     size_t step_count = 5000;
@@ -95,13 +96,20 @@ void render_scene(color *display, size_t width, size_t height,
     const float half_width = static_cast<float>(width) * 0.5f;
     const float half_height = static_cast<float>(height) * 0.5f;
 
+    const vec3<float> eye{0.0f, 0.0f, -scene.sphereZ};
+
     for (size_t row = 0; row < height; ++row) {
         std::cout << "Row " << row << std::endl;
         for (size_t col = 0; col < width; ++col) {
+            const vec3<float> p = { static_cast<float>(col) - half_width,
+                                    static_cast<float>(row) - half_height,
+                                    0.0f };
+
             display[row * width + col] =
                 march(static_cast<float>(col) - half_width,
                       static_cast<float>(row) - half_height,
-                      scene);
+                      scene,
+                      normalize(p - eye));
         }
     }
 }
