@@ -30,7 +30,8 @@ struct Sphere
 
 struct Scene
 {
-    Sphere sphere;
+    vec3<float> eye;
+    std::vector<Sphere> spheres;
     std::vector<Wall> walls;
 };
 
@@ -79,9 +80,11 @@ color march(float x, float y,
     for (size_t i = 0; i < step_count; ++i) {
         ray += dir;
 
-        if (sqr_norm(scene.sphere.center - ray) <= scene.sphere.radius * scene.sphere.radius) {
-            vec3<float> norm = ray - scene.sphere.center;
-            dir = normalize(dir - (2 * dot(ray, norm)) * norm);
+        for (const auto &sphere: scene.spheres) {
+            if (sqr_norm(sphere.center - ray) < sphere.radius * sphere.radius) {
+                vec3<float> norm = normalize(ray - sphere.center);
+                dir = normalize(dir - (2 * dot(dir, norm)) * norm);
+            }
         }
 
         for (const auto &wall: scene.walls) {
@@ -100,9 +103,8 @@ void render_scene(color *display, size_t width, size_t height,
     const float half_width = static_cast<float>(width) * 0.5f;
     const float half_height = static_cast<float>(height) * 0.5f;
 
-    const vec3<float> eye{0.0f, 0.0f, -scene.sphere.center.v[2]};
-
     for (size_t row = 0; row < height; ++row) {
+        std::cout << "Row " << row << std::endl;
         for (size_t col = 0; col < width; ++col) {
             const vec3<float> p = { static_cast<float>(col) - half_width,
                                     static_cast<float>(row) - half_height,
@@ -112,7 +114,7 @@ void render_scene(color *display, size_t width, size_t height,
                 march(static_cast<float>(col) - half_width,
                       static_cast<float>(row) - half_height,
                       scene,
-                      normalize(p - eye));
+                      normalize(p - scene.eye));
         }
     }
 }
@@ -131,8 +133,12 @@ int main(int argc, char *argv[])
     const float y = static_cast<float>(std::atof(argv[2]));
     const std::string file_name(argv[3]);
     render_scene(display.data(), width, height, {
-            { { x, y, 200.0f }, 100 }, // sphere
-            {                     // walls
+            { 0.0f, 0.0f, -200.0f },       // eye
+            {                              // spheres
+                { { x, y, 200.0f }, 100.0f },
+                { { x + 100.0f, y, 100.0f }, 100.0f }
+            },
+            {                              // walls
                 {
                     { 0, 0, -1, 500 },    // p
                     { 255, 255, 255 }     // c
