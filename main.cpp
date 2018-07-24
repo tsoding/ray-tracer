@@ -12,7 +12,7 @@
 template <typename T>
 using vec3 = vec<T, 3>;
 
-using color = vec3<uint8_t>;
+using color = vec3<float>;
 
 using plane = vec<float, 4>;
 
@@ -64,7 +64,7 @@ void save_display_to_file(const color *display,
     for (size_t row = 0; row < height; ++row) {
         for (size_t col = 0; col < width; ++col) {
             for (size_t k = 0; k < 3; ++k) {
-                fout.put(static_cast<char>(display[row * width + col].v[k]));
+                fout.put(static_cast<char>(255.0f * display[row * width + col].v[k]));
             }
         }
     }
@@ -94,7 +94,7 @@ color march(float x, float y,
         }
     }
 
-    return {0U, 0U, 0U};
+    return {0.0f, 0.0f, 0.0f};
 }
 
 void render_scene(color *display, size_t width, size_t height,
@@ -141,27 +141,27 @@ int main(int argc, char *argv[])
             {                              // walls
                 {
                     { 0, 0, -1, 500 },    // p
-                    { 255, 255, 255 }     // c
+                    { 1.0f, 1.0f, 1.0f }     // c
                 },
                 {
                     { 0, 0, 1, 500 },     // p
-                    { 255, 0, 0 }         // c
+                    { 1.0f, 0, 0 }         // c
                 },
                 {
                     { 1, 0, 0, 500 },    // p
-                    { 0, 255, 0 }        // c
+                    { 0, 1.0f, 0 }        // c
                 },
                 {
                     { -1, 0, 0, 500 },    // p
-                    { 0, 0, 255 }        // c
+                    { 0, 0, 1.0f }        // c
                 },
                 {
                     { 0, 1, 0, 500 },    // p
-                    { 255, 255, 0 }        // c
+                    { 1.0f, 1.0f, 0 }        // c
                 },
                 {
                     { 0, -1, 0, 500 },    // p
-                    { 255, 0, 255 }        // c
+                    { 1.0f, 0, 1.0f }        // c
                 }
             }
         });
