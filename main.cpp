@@ -6,6 +6,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <sstream>
 
 #include "vec.hpp"
 
@@ -20,12 +21,20 @@ struct Wall
 {
     plane p;
     color c;
+
+    friend std::ostream& operator<<(std::ostream& os, const Wall&wall) {
+		return os << "Wall{ p" << wall.p << " c" << wall.c << "}";
+	 }
 };
 
 struct Sphere
 {
     vec3<float> center;
     float radius;
+
+    friend std::ostream& operator<<(std::ostream& os, const Sphere&sphere) {
+		return os << "Sphere{ center " << sphere.center << " radius " << sphere.radius << "}";
+	 }
 };
 
 struct Scene
@@ -33,6 +42,18 @@ struct Scene
     vec3<float> eye;
     std::vector<Sphere> spheres;
     std::vector<Wall> walls;
+
+    friend std::ostream& operator<<(std::ostream& os, const Scene&scene) {
+		os << "Scene{" << std::endl
+		   << "  Eye:" << scene.eye << std::endl;
+		std::for_each(scene.spheres.begin(), scene.spheres.end(), [](Sphere const& sphere) {
+			  std::cout << "  " << sphere << std::endl;
+		});
+		std::for_each(scene.walls.begin(), scene.walls.end(), [](Wall const& wall) {
+			  std::cout << "  " << wall << std::endl;
+		});
+		return os << "}" << std::endl;
+    }
 };
 
 float dot(const plane &p, const vec3<float> &v)
@@ -119,6 +140,43 @@ void render_scene(color *display, size_t width, size_t height,
     }
 }
 
+const Scene load_scene_from_file(const char* filename)
+{
+   std::ifstream infile(filename);
+   Scene scene = {};
+   std::string type, line;
+
+   while(std::getline(infile, line)) {
+	  std::istringstream iss(line);
+	  iss >> type;
+
+	  if(type.compare("e") == 0) // eye
+	  {
+	    float eye1, eye2, eye3;
+		 iss >> eye1 >> eye2 >> eye3;
+		 scene.eye = { eye1, eye2, eye3 };
+	  }
+	  else if(type.compare("s") == 0) // sphere
+	  {
+		 float c1, c2, c3, radius;
+		 iss >> c1 >> c2 >> c3 >> radius;
+		 scene.spheres.push_back({ {c1, c2, c3}, radius });
+	  }
+	  else if(type.compare("w") == 0) // walls
+	  {
+		 float plane1, plane2, plane3, plane4, r, g, b;
+		 iss >> plane1 >> plane2 >> plane3 >> plane4 >> r >> g >> b;
+
+		 scene.walls.push_back({
+		    {plane1, plane2, plane3, plane4},
+			 {r, g, b}
+		 });
+	  }
+   }
+
+   return scene;
+}
+
 int main(int argc, char *argv[])
 {
     const size_t width = 800, height = 600;
@@ -132,39 +190,13 @@ int main(int argc, char *argv[])
     const float x = static_cast<float>(std::atof(argv[1]));
     const float y = static_cast<float>(std::atof(argv[2]));
     const std::string file_name(argv[3]);
-    render_scene(display.data(), width, height, {
-            { 0.0f, 0.0f, -200.0f },       // eye
-            {                              // spheres
-                { { x, y, 200.0f }, 100.0f },
-                { { x + 100.0f, y, 100.0f }, 100.0f }
-            },
-            {                              // walls
-                {
-                    { 0, 0, -1, 500 },    // p
-                    { 1.0f, 1.0f, 1.0f }     // c
-                },
-                {
-                    { 0, 0, 1, 500 },     // p
-                    { 1.0f, 0, 0 }         // c
-                },
-                {
-                    { 1, 0, 0, 500 },    // p
-                    { 0, 1.0f, 0 }        // c
-                },
-                {
-                    { -1, 0, 0, 500 },    // p
-                    { 0, 0, 1.0f }        // c
-                },
-                {
-                    { 0, 1, 0, 500 },    // p
-                    { 1.0f, 1.0f, 0 }        // c
-                },
-                {
-                    { 0, -1, 0, 500 },    // p
-                    { 1.0f, 0, 1.0f }        // c
-                }
-            }
-        });
+
+    auto scene = load_scene_from_file("./scene.txt");
+    scene.spheres.push_back({ { x, y, 200.0f }, 100.0f });
+    scene.spheres.push_back({ { x + 100.0f, y, 100.0f }, 100.0f } );
+    std::cout << scene << std::endl;
+
+    render_scene(display.data(), width, height, scene);
     save_display_to_file(display.data(), width, height, file_name);
 
     return 0;

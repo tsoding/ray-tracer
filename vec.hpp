@@ -5,6 +5,14 @@ template <typename T, size_t N>
 struct vec
 {
     T v[N];
+    friend std::ostream& operator<<(std::ostream& os, const vec&vec) {
+		os << "{";
+		for(int i=0; i < N - 1; i++)
+			os << vec.v[i] << ",";
+		os << vec.v[N-1] << "}";
+
+		return os;
+	 }
 };
 
 template <typename T, size_t N>
