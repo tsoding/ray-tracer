@@ -75,7 +75,7 @@ color march(float x, float y,
             vec3<float> dir)
 {
     vec3<float> ray = {x, y, 0.0f};
-    size_t step_count = 5000;
+    size_t step_count = 600;
 
     for (size_t i = 0; i < step_count; ++i) {
         ray += dir;
@@ -89,7 +89,7 @@ color march(float x, float y,
 
         for (const auto &wall: scene.walls) {
             if (std::abs(dot(wall.p, ray)) <= 0.5f) {
-                return wall.c;
+                return wall.c * (1.0f - static_cast<float>(i) / static_cast<float>(step_count));
             }
         }
     }
