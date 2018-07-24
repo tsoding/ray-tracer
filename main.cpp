@@ -58,7 +58,7 @@ void save_display_to_file(const color *display,
     for (size_t row = 0; row < height; ++row) {
         for (size_t col = 0; col < width; ++col) {
             for (size_t k = 0; k < 3; ++k) {
-                fout.put(static_cast<uint8_t>(display[row * width + col].v[k]));
+                fout.put(static_cast<char>(display[row * width + col].v[k]));
             }
         }
     }
