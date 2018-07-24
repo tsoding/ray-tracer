@@ -103,7 +103,6 @@ void render_scene(color *display, size_t width, size_t height,
     const vec3<float> eye{0.0f, 0.0f, -scene.sphere.center.v[2]};
 
     for (size_t row = 0; row < height; ++row) {
-        std::cout << "Row " << row << std::endl;
         for (size_t col = 0; col < width; ++col) {
             const vec3<float> p = { static_cast<float>(col) - half_width,
                                     static_cast<float>(row) - half_height,
@@ -123,16 +122,24 @@ int main(int argc, char *argv[])
     const size_t width = 800, height = 600;
     std::array<color, width * height> display;
 
+    if (argc < 4) {
+        std::cerr << "./ray-tracer <sphere-x> <sphere-y> <file-name>" << std::endl;
+        return -1;
+    }
+
+    const float x = static_cast<float>(std::atof(argv[1]));
+    const float y = static_cast<float>(std::atof(argv[2]));
+    const std::string file_name(argv[3]);
     render_scene(display.data(), width, height, {
-            { { -100.0f, 0.0f, 200.0f }, 100 }, // sphere
+            { { x, y, 200.0f }, 100 }, // sphere
             {                     // walls
                 {
                     { 0, 0, -1, 500 },    // p
                     { 255, 255, 255 }     // c
                 },
                 {
-                    { 0, 0, 1, 500 },    // p
-                    { 255, 0, 0 }        // c
+                    { 0, 0, 1, 500 },     // p
+                    { 255, 0, 0 }         // c
                 },
                 {
                     { 1, 0, 0, 500 },    // p
@@ -152,7 +159,7 @@ int main(int argc, char *argv[])
                 }
             }
         });
-    save_display_to_file(display.data(), width, height, "output.ppm");
+    save_display_to_file(display.data(), width, height, file_name);
 
     return 0;
 }
