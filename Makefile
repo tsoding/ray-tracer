@@ -1,4 +1,6 @@
-all: output.png
+all: ray-tracer
+
+trace: output.png
 
 output.png: output.ppm
 	convert output.ppm output.png
