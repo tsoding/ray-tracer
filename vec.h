@@ -39,7 +39,8 @@ vec<T, N> operator-(const vec<T, N> &v1, const vec<T, N> &v2) {
 }
 
 template <typename T, size_t N>
-vec<T, N> &operator+=(vec<T, N> &v1, const vec<T, N> &v2) {
+vec<T, N> &operator+=(vec<T, N> &v1,  // NOLINT(runtime/references)
+                      const vec<T, N> &v2) {
     for (size_t i = 0; i < N; ++i) {
         v1.v[i] += v2.v[i];
     }
