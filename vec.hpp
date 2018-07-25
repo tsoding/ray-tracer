@@ -8,6 +8,16 @@ struct vec
 };
 
 template <typename T, size_t N>
+std::ostream& operator<<(std::ostream& os, const vec<T, N>&vec) {
+	os << "{";
+	for(size_t i=0; i < N - 1; i++)
+		os << vec.v[i] << ",";
+	os << vec.v[N-1] << "}";
+
+	return os;
+}
+
+template <typename T, size_t N>
 vec<T, N> operator+(const vec<T, N> &v1, const vec<T, N> &v2)
 {
     vec<T, N> result;
