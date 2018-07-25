@@ -2,7 +2,7 @@ dist: trusty
 language: cpp
 compiler:
   - clang
-  # TODO: gcc is not supported on Travis CI
+  # TODO(#21): gcc is not supported on Travis CI
   # - gcc
 script:
   - make
