@@ -10,7 +10,7 @@ struct vec
 template <typename T, size_t N>
 std::ostream& operator<<(std::ostream& os, const vec<T, N>&vec) {
 	os << "{";
-	for(int i=0; i < N - 1; i++)
+	for(size_t i=0; i < N - 1; i++)
 		os << vec.v[i] << ",";
 	os << vec.v[N-1] << "}";
 
