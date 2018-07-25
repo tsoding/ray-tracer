@@ -11,7 +11,7 @@ output.ppm: ray-tracer
 	./ray-tracer 0 0 output.ppm
 
 ray-tracer: main.cpp vec.h lint
-	$(CXX) -Wall -Werror -Wconversion -Wno-missing-braces -std=c++14 main.cpp -o ray-tracer
+	$(CXX) -Wall -Werror -Wconversion -Wno-missing-braces -std=c++17 main.cpp -o ray-tracer
 
 .PHONY: lint
 lint: cpplint.py
