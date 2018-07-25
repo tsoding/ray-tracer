@@ -21,40 +21,41 @@ struct Wall
 {
     plane p;
     color c;
-
-    friend std::ostream& operator<<(std::ostream& os, const Wall&wall) {
-		return os << "Wall{ p" << wall.p << " c" << wall.c << "}";
-	 }
 };
+
+std::ostream& operator<<(std::ostream& os, const Wall&wall) {
+    return os << "Wall{ p" << wall.p << " c" << wall.c << "}";
+}
 
 struct Sphere
 {
     vec3<float> center;
     float radius;
-
-    friend std::ostream& operator<<(std::ostream& os, const Sphere&sphere) {
-		return os << "Sphere{ center " << sphere.center << " radius " << sphere.radius << "}";
-	 }
 };
+
+std::ostream& operator<<(std::ostream& os, const Sphere&sphere) {
+	return os << "Sphere{ center " << sphere.center << " radius " << sphere.radius << "}";
+}
 
 struct Scene
 {
     vec3<float> eye;
     std::vector<Sphere> spheres;
     std::vector<Wall> walls;
-
-    friend std::ostream& operator<<(std::ostream& os, const Scene&scene) {
-		os << "Scene{" << std::endl
-		   << "  Eye:" << scene.eye << std::endl;
-		std::for_each(scene.spheres.begin(), scene.spheres.end(), [](Sphere const& sphere) {
-			  std::cout << "  " << sphere << std::endl;
-		});
-		std::for_each(scene.walls.begin(), scene.walls.end(), [](Wall const& wall) {
-			  std::cout << "  " << wall << std::endl;
-		});
-		return os << "}" << std::endl;
-    }
 };
+
+std::ostream& operator<<(std::ostream& os, const Scene&scene) {
+	os << "Scene{" << std::endl
+		<< "  Eye:" << scene.eye << std::endl;
+
+	for(const auto&sphere: scene.spheres)
+		  std::cout << "  " << sphere << std::endl;
+
+	for(const auto&wall: scene.walls)
+		  std::cout << "  " << wall << std::endl;
+
+	return os << "}" << std::endl;
+}
 
 float dot(const plane &p, const vec3<float> &v)
 {
@@ -150,19 +151,19 @@ const Scene load_scene_from_file(const char* filename)
 	  std::istringstream iss(line);
 	  iss >> type;
 
-	  if(type.compare("e") == 0) // eye
+	  if(type == "e") // eye
 	  {
 	    float eye1, eye2, eye3;
 		 iss >> eye1 >> eye2 >> eye3;
 		 scene.eye = { eye1, eye2, eye3 };
 	  }
-	  else if(type.compare("s") == 0) // sphere
+	  else if(type == "s") // sphere
 	  {
 		 float c1, c2, c3, radius;
 		 iss >> c1 >> c2 >> c3 >> radius;
 		 scene.spheres.push_back({ {c1, c2, c3}, radius });
 	  }
-	  else if(type.compare("w") == 0) // walls
+	  else if(type == "w") // walls
 	  {
 		 float plane1, plane2, plane3, plane4, r, g, b;
 		 iss >> plane1 >> plane2 >> plane3 >> plane4 >> r >> g >> b;
