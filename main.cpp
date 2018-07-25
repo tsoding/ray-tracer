@@ -8,7 +8,7 @@
 #include <vector>
 #include <sstream>
 
-#include "vec.hpp"
+#include "./vec.h"
 
 template <typename T>
 using vec3 = vec<T, 3>;
@@ -17,8 +17,7 @@ using color = vec3<float>;
 
 using plane = vec<float, 4>;
 
-struct Wall
-{
+struct Wall {
     plane p;
     color c;
 };
@@ -27,56 +26,54 @@ std::ostream& operator<<(std::ostream& os, const Wall&wall) {
     return os << "Wall{ p" << wall.p << " c" << wall.c << "}";
 }
 
-struct Sphere
-{
+struct Sphere {
     vec3<float> center;
     float radius;
 };
 
 std::ostream& operator<<(std::ostream& os, const Sphere&sphere) {
-	return os << "Sphere{ center " << sphere.center << " radius " << sphere.radius << "}";
+    return os << "Sphere{ center "
+              << sphere.center
+              << " radius "
+              << sphere.radius
+              << "}";
 }
 
-struct Scene
-{
+struct Scene {
     vec3<float> eye;
     std::vector<Sphere> spheres;
     std::vector<Wall> walls;
 };
 
 std::ostream& operator<<(std::ostream& os, const Scene&scene) {
-	os << "Scene{" << std::endl
-		<< "  Eye:" << scene.eye << std::endl;
+    os << "Scene{" << std::endl
+        << "  Eye:" << scene.eye << std::endl;
 
-	for(const auto&sphere: scene.spheres)
-		  std::cout << "  " << sphere << std::endl;
+    for (const auto&sphere : scene.spheres)
+          std::cout << "  " << sphere << std::endl;
 
-	for(const auto&wall: scene.walls)
-		  std::cout << "  " << wall << std::endl;
+    for (const auto&wall : scene.walls)
+          std::cout << "  " << wall << std::endl;
 
-	return os << "}" << std::endl;
+    return os << "}" << std::endl;
 }
 
-float dot(const plane &p, const vec3<float> &v)
-{
+float dot(const plane &p, const vec3<float> &v) {
     return p.v[0] * v.v[0] + p.v[1] * v.v[1] + p.v[2] * v.v[2] + p.v[3];
 }
 
-float dot(const vec3<float> &v1, const vec3<float> &v2)
-{
+float dot(const vec3<float> &v1, const vec3<float> &v2) {
     return v1.v[0] * v2.v[0] + v1.v[1] * v2.v[1] + v1.v[2] * v2.v[2];
 }
 
-vec3<float> normalize(const vec3<float> &v)
-{
+vec3<float> normalize(const vec3<float> &v) {
     return 1.0f / sqrtf(sqr_norm(v)) * v;
 }
 
 void save_display_to_file(const color *display,
                           size_t width,
                           size_t height,
-                          const std::string &filepath)
-{
+                          const std::string &filepath) {
     std::ofstream fout(filepath, std::ofstream::out | std::ostream::binary);
 
     fout << "P6" << std::endl;
@@ -86,32 +83,36 @@ void save_display_to_file(const color *display,
     for (size_t row = 0; row < height; ++row) {
         for (size_t col = 0; col < width; ++col) {
             for (size_t k = 0; k < 3; ++k) {
-                fout.put(static_cast<char>(255.0f * display[row * width + col].v[k]));
+                const float x = 255.0f * display[row * width + col].v[k];
+                fout.put(static_cast<char>(x));
             }
         }
     }
 }
 
+float color_factor(size_t steps, size_t step_count) {
+    return 1.0f - static_cast<float>(steps) / static_cast<float>(step_count);
+}
+
 color march(float x, float y,
             const Scene &scene,
-            vec3<float> dir)
-{
+            vec3<float> dir) {
     vec3<float> ray = {x, y, 0.0f};
     size_t step_count = 600;
 
     for (size_t i = 0; i < step_count; ++i) {
         ray += dir;
 
-        for (const auto &sphere: scene.spheres) {
+        for (const auto &sphere : scene.spheres) {
             if (sqr_norm(sphere.center - ray) < sphere.radius * sphere.radius) {
                 vec3<float> norm = normalize(ray - sphere.center);
                 dir = normalize(dir - (2 * dot(dir, norm)) * norm);
             }
         }
 
-        for (const auto &wall: scene.walls) {
+        for (const auto &wall : scene.walls) {
             if (std::abs(dot(wall.p, ray)) <= 0.5f) {
-                return wall.c * (1.0f - static_cast<float>(i) / static_cast<float>(step_count));
+                return wall.c * color_factor(i, step_count);
             }
         }
     }
@@ -120,8 +121,7 @@ color march(float x, float y,
 }
 
 void render_scene(color *display, size_t width, size_t height,
-                  const Scene &scene)
-{
+                  const Scene &scene) {
     const float half_width = static_cast<float>(width) * 0.5f;
     const float half_height = static_cast<float>(height) * 0.5f;
 
@@ -141,50 +141,44 @@ void render_scene(color *display, size_t width, size_t height,
     }
 }
 
-const Scene load_scene_from_file(const char* filename)
-{
-   std::ifstream infile(filename);
-   Scene scene = {};
-   std::string type, line;
+const Scene load_scene_from_file(const char* filename) {
+    std::ifstream infile(filename);
+    Scene scene = {};
+    std::string type, line;
 
-   while(std::getline(infile, line)) {
-	  std::istringstream iss(line);
-	  iss >> type;
+    while (std::getline(infile, line)) {
+        std::istringstream iss(line);
+        iss >> type;
 
-	  if(type == "e") // eye
-	  {
-	    float eye1, eye2, eye3;
-		 iss >> eye1 >> eye2 >> eye3;
-		 scene.eye = { eye1, eye2, eye3 };
-	  }
-	  else if(type == "s") // sphere
-	  {
-		 float c1, c2, c3, radius;
-		 iss >> c1 >> c2 >> c3 >> radius;
-		 scene.spheres.push_back({ {c1, c2, c3}, radius });
-	  }
-	  else if(type == "w") // walls
-	  {
-		 float plane1, plane2, plane3, plane4, r, g, b;
-		 iss >> plane1 >> plane2 >> plane3 >> plane4 >> r >> g >> b;
+        if (type == "e") {  // eye
+            float eye1, eye2, eye3;
+            iss >> eye1 >> eye2 >> eye3;
+            scene.eye = { eye1, eye2, eye3 };
+        } else if (type == "s") {  // sphere
+            float c1, c2, c3, radius;
+            iss >> c1 >> c2 >> c3 >> radius;
+            scene.spheres.push_back({ {c1, c2, c3}, radius });
+        } else if (type == "w") {  // walls
+            float plane1, plane2, plane3, plane4, r, g, b;
+            iss >> plane1 >> plane2 >> plane3 >> plane4 >> r >> g >> b;
 
-		 scene.walls.push_back({
-		    {plane1, plane2, plane3, plane4},
-			 {r, g, b}
-		 });
-	  }
-   }
+            scene.walls.push_back({
+                    {plane1, plane2, plane3, plane4},
+                    {r, g, b}
+                });
+        }
+    }
 
-   return scene;
+    return scene;
 }
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
     const size_t width = 800, height = 600;
     std::array<color, width * height> display;
 
     if (argc < 4) {
-        std::cerr << "./ray-tracer <sphere-x> <sphere-y> <file-name>" << std::endl;
+        std::cerr << "./ray-tracer <sphere-x> <sphere-y> <file-name>"
+                  << std::endl;
         return -1;
     }
 
@@ -194,7 +188,7 @@ int main(int argc, char *argv[])
 
     auto scene = load_scene_from_file("./scene.txt");
     scene.spheres.push_back({ { x, y, 200.0f }, 100.0f });
-    scene.spheres.push_back({ { x + 100.0f, y, 100.0f }, 100.0f } );
+    scene.spheres.push_back({ { x + 100.0f, y, 100.0f }, 100.0f });
     std::cout << scene << std::endl;
 
     render_scene(display.data(), width, height, scene);

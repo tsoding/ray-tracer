@@ -1,0 +1,8 @@
+dist: trusty
+language: cpp
+compiler:
+  - clang
+  # TODO(#21): gcc is not supported on Travis CI
+  # - gcc
+script:
+  - make
