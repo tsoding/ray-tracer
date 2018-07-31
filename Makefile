@@ -8,7 +8,7 @@ output.png: output.ppm
 	convert output.ppm output.png
 
 output.ppm: ray-tracer
-	./ray-tracer 0 0 output.ppm
+	./ray-tracer scene.txt output.ppm
 
 ray-tracer: src/main.cpp src/vec.h lint
 	$(CXX) -Wall -Werror -Wconversion -Wno-missing-braces -std=c++17 src/main.cpp -o ray-tracer
