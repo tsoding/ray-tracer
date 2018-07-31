@@ -10,8 +10,11 @@ template <typename T, size_t N>
 vec<T, N> recip(const vec<T, N> &v) {
     vec<T, N> r;
     for (size_t i = 0; i < N; ++i) {
-        // TODO: division by zero
-        r.v[i] = 1 / v.v[i];
+        if (v.v[i] == 0.0f) {
+            r.v[i] = 0.0f;
+        } else {
+            r.v[i] = 1 / v.v[i];
+        }
     }
     return r;
 }
