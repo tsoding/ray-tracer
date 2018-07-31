@@ -15,7 +15,7 @@ ray-tracer: src/main.cpp src/vec.h src/mat4x4.h lint
 
 .PHONY: lint
 lint: cpplint.py
-	python cpplint.py src/*.cpp src/*.h
+	python2 cpplint.py src/*.cpp src/*.h
 
 cpplint.py:
 	wget https://raw.githubusercontent.com/google/styleguide/ab48617e00be9d111804bd3715dd7b5f5732c9a3/cpplint/cpplint.py
