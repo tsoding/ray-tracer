@@ -10,8 +10,8 @@ output.png: output.ppm
 output.ppm: ray-tracer
 	./ray-tracer scene.txt output.ppm
 
-ray-tracer: src/main.cpp src/vec.h lint
-	$(CXX) -Wall -Werror -Wconversion -Wno-missing-braces -std=c++17 src/main.cpp -o ray-tracer
+ray-tracer: src/main.cpp src/vec.h src/mat4x4.h lint
+	$(CXX) -Wall -Werror -Wconversion -Wno-missing-braces -Wunused-variable -std=c++17 src/main.cpp -o ray-tracer
 
 .PHONY: lint
 lint: cpplint.py
