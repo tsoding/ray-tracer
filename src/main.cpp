@@ -141,7 +141,7 @@ void render_scene(color *display, size_t width, size_t height,
     }
 }
 
-const Scene load_scene_from_file(const char* filename) {
+const Scene load_scene_from_file(const std::string &filename) {
     std::ifstream infile(filename);
     Scene scene = {};
     std::string type, line;
@@ -176,23 +176,21 @@ int main(int argc, char *argv[]) {
     const size_t width = 800, height = 600;
     std::array<color, width * height> display;
 
-    if (argc < 4) {
-        std::cerr << "./ray-tracer <sphere-x> <sphere-y> <file-name>"
+    if (argc < 3) {
+        std::cerr << "./ray-tracer <input-file> <output-file>"
                   << std::endl;
         return -1;
     }
 
-    const float x = static_cast<float>(std::atof(argv[1]));
-    const float y = static_cast<float>(std::atof(argv[2]));
-    const std::string file_name(argv[3]);
+    const std::string input_file(argv[1]);
+    const std::string output_file(argv[2]);
 
-    auto scene = load_scene_from_file("./scene.txt");
-    scene.spheres.push_back({ { x, y, 200.0f }, 100.0f });
-    scene.spheres.push_back({ { x + 100.0f, y, 100.0f }, 100.0f });
+    auto scene = load_scene_from_file(input_file);
+
     std::cout << scene << std::endl;
 
     render_scene(display.data(), width, height, scene);
-    save_display_to_file(display.data(), width, height, file_name);
+    save_display_to_file(display.data(), width, height, output_file);
 
     return 0;
 }
