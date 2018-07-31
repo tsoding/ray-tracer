@@ -7,13 +7,34 @@ struct vec {
 };
 
 template <typename T, size_t N>
-std::ostream& operator<<(std::ostream& os, const vec<T, N>&vec) {
+vec<T, N> recip(const vec<T, N> &v) {
+    vec<T, N> r;
+    for (size_t i = 0; i < N; ++i) {
+        if (v.v[i] == 0.0f) {
+            r.v[i] = 0.0f;
+        } else {
+            r.v[i] = 1 / v.v[i];
+        }
+    }
+    return r;
+}
+
+template <typename T, size_t N>
+std::ostream& operator<<(std::ostream& os, const vec<T, N> &vec) {
     os << "{";
     for (size_t i = 0; i < N - 1; i++)
         os << vec.v[i] << ",";
     os << vec.v[N-1] << "}";
 
     return os;
+}
+
+template <typename T, size_t N>
+std::istream& operator>>(std::istream& is, vec<T, N> &vec) {
+    for (size_t i = 0; i < N; ++i) {
+        is >> vec.v[i];
+    }
+    return is;
 }
 
 template <typename T, size_t N>

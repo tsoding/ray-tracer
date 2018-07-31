@@ -7,8 +7,11 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <numeric>
+#include <algorithm>
 
 #include "./vec.h"
+#include "./mat4x4.h"
 
 template <typename T>
 using vec3 = vec<T, 3>;
@@ -39,10 +42,42 @@ std::ostream& operator<<(std::ostream& os, const Sphere&sphere) {
               << "}";
 }
 
+struct Cuboid {
+    vec3<float> trans;
+    vec3<float> rot;
+    vec3<float> scale;
+};
+
+mat4x4<float> inverse_mat_of_cuboid(const Cuboid &cuboid) {
+    const std::vector<mat4x4<float>> mts = {
+        trans_mat(cuboid.trans * -1.0f),
+        rot_x_mat(cuboid.rot.v[0] * -1.0f),
+        rot_y_mat(cuboid.rot.v[1] * -1.0f),
+        rot_z_mat(cuboid.rot.v[2] * -1.0f),
+        scale_mat(recip(cuboid.scale))
+    };
+
+    return std::accumulate(mts.begin(), mts.end(), id_mat(), dot_mat4x4);
+}
+
+bool is_point_inside_of_cuboid(const vec3<float> &p,
+                               const mat4x4<float> &inverse_mat) {
+    const vec3<float> p1 = dot(inverse_mat, p);
+
+    for (size_t i = 0; i < 3; ++i) {
+        if (p1.v[i] > 0.5f || p1.v[i] < -0.5f) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 struct Scene {
     vec3<float> eye;
     std::vector<Sphere> spheres;
     std::vector<Wall> walls;
+    std::vector<Cuboid> cuboids;
 };
 
 std::ostream& operator<<(std::ostream& os, const Scene&scene) {
@@ -96,7 +131,10 @@ float color_factor(size_t steps, size_t step_count) {
 
 color march(float x, float y,
             const Scene &scene,
+            const std::vector<mat4x4<float>> &cuboid_inverse_mats,
             vec3<float> dir) {
+    const color cuboid_color = {1.0f, 0.0f, 0.0f};
+
     vec3<float> ray = {x, y, 0.0f};
     size_t step_count = 600;
 
@@ -115,6 +153,13 @@ color march(float x, float y,
                 return wall.c * color_factor(i, step_count);
             }
         }
+
+        // TODO(#38): cuboid is rendered incorrectly
+        for (const auto &cuboid_inverse_mat : cuboid_inverse_mats) {
+            if (is_point_inside_of_cuboid(ray, cuboid_inverse_mat)) {
+                return cuboid_color * color_factor(i, step_count);
+            }
+        }
     }
 
     return {0.0f, 0.0f, 0.0f};
@@ -125,8 +170,14 @@ void render_scene(color *display, size_t width, size_t height,
     const float half_width = static_cast<float>(width) * 0.5f;
     const float half_height = static_cast<float>(height) * 0.5f;
 
+    std::vector<mat4x4<float>> cuboid_inverse_mats;
+
+    for (const auto &cuboid : scene.cuboids) {
+        cuboid_inverse_mats.push_back(inverse_mat_of_cuboid(cuboid));
+    }
+
     for (size_t row = 0; row < height; ++row) {
-        std::cout << "Row " << row << std::endl;
+        // std::cout << "Row " << row << std::endl;
         for (size_t col = 0; col < width; ++col) {
             const vec3<float> p = { static_cast<float>(col) - half_width,
                                     static_cast<float>(row) - half_height,
@@ -136,6 +187,7 @@ void render_scene(color *display, size_t width, size_t height,
                 march(static_cast<float>(col) - half_width,
                       static_cast<float>(row) - half_height,
                       scene,
+                      cuboid_inverse_mats,
                       normalize(p - scene.eye));
         }
     }
@@ -166,6 +218,14 @@ const Scene load_scene_from_file(const std::string &filename) {
                     {plane1, plane2, plane3, plane4},
                     {r, g, b}
                 });
+        } else if (type == "c") {  // cuboid
+            Cuboid cuboid;
+
+            iss >> cuboid.trans
+                >> cuboid.rot
+                >> cuboid.scale;
+
+            scene.cuboids.push_back(cuboid);
         }
     }
 
