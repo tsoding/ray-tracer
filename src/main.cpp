@@ -154,7 +154,7 @@ color march(float x, float y,
             }
         }
 
-        // TODO: cuboid is rendered incorrectly
+        // TODO(#38): cuboid is rendered incorrectly
         for (const auto &cuboid_inverse_mat : cuboid_inverse_mats) {
             if (is_point_inside_of_cuboid(ray, cuboid_inverse_mat)) {
                 return cuboid_color * color_factor(i, step_count);
