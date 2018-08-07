@@ -45,18 +45,25 @@ struct Cuboid {
     vec3<float> trans;
     vec3<float> rot;
     vec3<float> scale;
+    color c;
 };
 
 mat4x4<float> inverse_mat_of_cuboid(const Cuboid &cuboid) {
     const std::vector<mat4x4<float>> mts = {
-        trans_mat(cuboid.trans * -1.0f),
-        rot_x_mat(cuboid.rot.v[0] * -1.0f),
-        rot_y_mat(cuboid.rot.v[1] * -1.0f),
-        rot_z_mat(cuboid.rot.v[2] * -1.0f),
-        scale_mat(recip(cuboid.scale))
+        rot_z_mat(-cuboid.rot.v[2]),
+        rot_y_mat(-cuboid.rot.v[1]),
+        rot_x_mat(-cuboid.rot.v[0]),
+        scale_mat(recip(cuboid.scale)),
+        trans_mat(cuboid.trans * -1.0f)
     };
 
-    return std::accumulate(mts.begin(), mts.end(), id_mat(), dot_mat4x4);
+    mat4x4<float> result = id_mat();
+
+    for (const auto &m : mts) {
+        result = dot_mat4x4(result, m);
+    }
+
+    return result;
 }
 
 bool is_point_inside_of_cuboid(const vec3<float> &p,
@@ -125,15 +132,15 @@ void save_display_to_file(const color *display,
 }
 
 float color_factor(size_t steps, size_t step_count) {
-    return 1.0f - static_cast<float>(steps) / static_cast<float>(step_count);
+    const float x =
+        1.0f - static_cast<float>(steps) / static_cast<float>(step_count);
+    return x;
 }
 
 color march(float x, float y,
             const Scene &scene,
             const std::vector<mat4x4<float>> &cuboid_inverse_mats,
             vec3<float> dir) {
-    const color cuboid_color = {1.0f, 0.0f, 0.0f};
-
     vec3<float> ray = {x, y, 0.0f};
     size_t step_count = 600;
 
@@ -154,9 +161,9 @@ color march(float x, float y,
         }
 
         // TODO(#38): cuboid is rendered incorrectly
-        for (const auto &cuboid_inverse_mat : cuboid_inverse_mats) {
-            if (is_point_inside_of_cuboid(ray, cuboid_inverse_mat)) {
-                return cuboid_color * color_factor(i, step_count);
+        for (size_t i = 0; i < scene.cuboids.size(); ++i) {
+            if (is_point_inside_of_cuboid(ray, cuboid_inverse_mats[i])) {
+                return scene.cuboids[i].c * color_factor(i, step_count);
             }
         }
     }
@@ -220,10 +227,13 @@ const Scene load_scene_from_file(const std::string &filename) {
                 });
         } else if (type == "c") {  // cuboid
             Cuboid cuboid;
+            std::string c;
 
             iss >> cuboid.trans
                 >> cuboid.rot
-                >> cuboid.scale;
+                >> cuboid.scale
+                >> c;
+            cuboid.c = color_from_hex(c).value_or(color{1.0f, 1.0f, 1.0f});
 
             scene.cuboids.push_back(cuboid);
         }
