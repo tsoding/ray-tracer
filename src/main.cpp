@@ -10,13 +10,12 @@
 #include <numeric>
 #include <algorithm>
 
-#include "./vec.h"
-#include "./mat4x4.h"
+#include "./color.hpp"
+#include "./mat4x4.hpp"
+#include "./vec.hpp"
 
 template <typename T>
 using vec3 = vec<T, 3>;
-
-using color = vec3<float>;
 
 using plane = vec<float, 4>;
 
@@ -211,12 +210,13 @@ const Scene load_scene_from_file(const std::string &filename) {
             iss >> c1 >> c2 >> c3 >> radius;
             scene.spheres.push_back({ {c1, c2, c3}, radius });
         } else if (type == "w") {  // walls
-            float plane1, plane2, plane3, plane4, r, g, b;
-            iss >> plane1 >> plane2 >> plane3 >> plane4 >> r >> g >> b;
+            float plane1, plane2, plane3, plane4;
+            std::string color_hex;
+            iss >> plane1 >> plane2 >> plane3 >> plane4 >> color_hex;
 
             scene.walls.push_back({
                     {plane1, plane2, plane3, plane4},
-                    {r, g, b}
+                    color_from_hex(color_hex).value_or(color{1.0f, 1.0f, 1.0f})
                 });
         } else if (type == "c") {  // cuboid
             Cuboid cuboid;

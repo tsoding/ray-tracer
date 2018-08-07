@@ -1,9 +1,9 @@
-#ifndef SRC_MAT4X4_H_
-#define SRC_MAT4X4_H_
+#ifndef SRC_MAT4X4_HPP_
+#define SRC_MAT4X4_HPP_
 
 #include <cmath>
 
-#include "./vec.h"
+#include "./vec.hpp"
 
 template <typename T>
 using mat4x4 = vec<T, 4 * 4>;
@@ -105,4 +105,4 @@ mat4x4<float> scale_mat(vec<float, 3> v) {
     };
 }
 
-#endif  // SRC_MAT4X4_H_
+#endif  // SRC_MAT4X4_HPP_
