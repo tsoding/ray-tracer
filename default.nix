@@ -2,7 +2,7 @@ with import <nixpkgs> {}; {
     raytracerEnv = stdenv.mkDerivation {
         name = "raytracer-env";
         buildInputs = [ stdenv
-                        gcc
+                        gcc7
                         imagemagick
                       ];
     };

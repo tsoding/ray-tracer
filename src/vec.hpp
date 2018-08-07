@@ -1,5 +1,5 @@
-#ifndef SRC_VEC_H_
-#define SRC_VEC_H_
+#ifndef SRC_VEC_HPP_
+#define SRC_VEC_HPP_
 
 template <typename T, size_t N>
 struct vec {
@@ -96,4 +96,4 @@ T sqr_norm(const vec<T, N> &v) {
     return acc;
 }
 
-#endif  // SRC_VEC_H_
+#endif  // SRC_VEC_HPP_
