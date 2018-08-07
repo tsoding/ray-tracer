@@ -30,7 +30,7 @@ vec<float, 3> dot(const mat4x4<float> &m, const vec<float, 3> &v) {
     for (size_t i = 0; i < 4; ++i) {
         r.v[i] = 0.0f;
         for (size_t j = 0; j < 4; ++j) {
-            r.v[i] += homo_v.v[i] * m.v[i * 4 + j];
+            r.v[i] += homo_v.v[j] * m.v[i * 4 + j];
         }
     }
 
@@ -65,10 +65,10 @@ mat4x4<float> rot_x_mat(float a) {
     using std::sin;
 
     return {
-        1.0f, 0.0f,    0.0f,   0.0f,
-        0.0f, cos(a), -sin(a), 0.0f,
-        0.0f, sin(a),  cos(a), 0.0f,
-        0.0f, 0.0f,    0.0f,   1.0f
+        1.0f,  0.0f,    0.0f,   0.0f,
+        0.0f,  cos(a),  sin(a), 0.0f,
+        0.0f, -sin(a),  cos(a), 0.0f,
+        0.0f,  0.0f,    0.0f,   1.0f
     };
 }
 
