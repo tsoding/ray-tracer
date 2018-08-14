@@ -46,49 +46,10 @@ std::ostream& operator<<(std::ostream& os, const Sphere&sphere) {
               << "}";
 }
 
-struct Cuboid {
-    vec3<float> trans;
-    vec3<float> rot;
-    vec3<float> scale;
-    color c;
-};
-
-mat4x4<float> inverse_mat_of_cuboid(const Cuboid &cuboid) {
-    const std::vector<mat4x4<float>> mts = {
-        rot_z_mat(-cuboid.rot.v[2]),
-        rot_y_mat(-cuboid.rot.v[1]),
-        rot_x_mat(-cuboid.rot.v[0]),
-        scale_mat(recip(cuboid.scale)),
-        trans_mat(cuboid.trans * -1.0f)
-    };
-
-    mat4x4<float> result = id_mat();
-
-    for (const auto &m : mts) {
-        result = dot_mat4x4(result, m);
-    }
-
-    return result;
-}
-
-bool is_point_inside_of_cuboid(const vec3<float> &p,
-                               const mat4x4<float> &inverse_mat) {
-    const vec3<float> p1 = dot(inverse_mat, p);
-
-    for (size_t i = 0; i < 3; ++i) {
-        if (p1.v[i] > 0.5f || p1.v[i] < -0.5f) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
 struct Scene {
     vec3<float> eye;
     std::vector<Sphere> spheres;
     std::vector<Wall> walls;
-    std::vector<Cuboid> cuboids;
 };
 
 std::ostream& operator<<(std::ostream& os, const Scene&scene) {
@@ -144,7 +105,6 @@ float color_factor(size_t steps, size_t step_count) {
 
 color march(float x, float y,
             const Scene &scene,
-            const std::vector<mat4x4<float>> &cuboid_inverse_mats,
             vec3<float> dir) {
     vec3<float> ray = {x, y, 0.0f};
     size_t step_count = 600;
@@ -164,13 +124,6 @@ color march(float x, float y,
                 return wall.c * color_factor(i, step_count);
             }
         }
-
-        // TODO(#38): cuboid is rendered incorrectly
-        for (size_t i = 0; i < scene.cuboids.size(); ++i) {
-            if (is_point_inside_of_cuboid(ray, cuboid_inverse_mats[i])) {
-                return scene.cuboids[i].c * color_factor(i, step_count);
-            }
-        }
     }
 
     return {0.0f, 0.0f, 0.0f};
@@ -181,14 +134,8 @@ void render_scene(color *display, size_t width, size_t height,
     const float half_width = static_cast<float>(width) * 0.5f;
     const float half_height = static_cast<float>(height) * 0.5f;
 
-    std::vector<mat4x4<float>> cuboid_inverse_mats;
-
-    for (const auto &cuboid : scene.cuboids) {
-        cuboid_inverse_mats.push_back(inverse_mat_of_cuboid(cuboid));
-    }
-
     for (size_t row = 0; row < height; ++row) {
-        // std::cout << "Row " << row << std::endl;
+        std::cout << "Row " << row << std::endl;
         for (size_t col = 0; col < width; ++col) {
             const vec3<float> p = { static_cast<float>(col) - half_width,
                                     static_cast<float>(row) - half_height,
@@ -198,7 +145,6 @@ void render_scene(color *display, size_t width, size_t height,
                 march(static_cast<float>(col) - half_width,
                       static_cast<float>(row) - half_height,
                       scene,
-                      cuboid_inverse_mats,
                       normalize(p - scene.eye));
         }
     }
@@ -230,17 +176,6 @@ const Scene load_scene_from_file(const std::string &filename) {
                     {plane1, plane2, plane3, plane4},
                     color_from_hex(color_hex).value_or(color{1.0f, 1.0f, 1.0f})
                 });
-        } else if (type == "c") {  // cuboid
-            Cuboid cuboid;
-            std::string c;
-
-            iss >> cuboid.trans
-                >> cuboid.rot
-                >> cuboid.scale
-                >> c;
-            cuboid.c = color_from_hex(c).value_or(color{1.0f, 1.0f, 1.0f});
-
-            scene.cuboids.push_back(cuboid);
         }
     }
 
@@ -273,8 +208,6 @@ void preview_mode(const size_t width,
     const float half_width = static_cast<float>(width) * 0.5f;
     const float half_height = static_cast<float>(height) * 0.5f;
 
-    const std::vector<mat4x4<float>> id = {id_mat()};
-
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
@@ -294,7 +227,6 @@ void preview_mode(const size_t width,
                 march(static_cast<float>(col) - half_width,
                       static_cast<float>(row) - half_height,
                       scene,
-                      id,
                       normalize(p - scene.eye));
 
             buffer[row * width * 4 + col * 4 + 0] = static_cast<sf::Uint8>(pixel_color.v[0] * 255.0f);
