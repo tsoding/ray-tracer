@@ -227,7 +227,7 @@ void preview_mode(const size_t width,
             }
         }
 
-        const size_t row = rand() % height;
+        const size_t row = static_cast<size_t>(rand()) % height;
 
         for (size_t col = 0; col < width; ++col) {
             const vec3<float> ray = { static_cast<float>(col) - half_width,
