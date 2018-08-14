@@ -1,5 +1,6 @@
 #include <cmath>
 #include <cstdint>
+#include <cstring>
 
 #include <array>
 #include <fstream>
@@ -194,8 +195,11 @@ void file_render_mode(const size_t width,
 
 void preview_mode(const size_t width,
                   const size_t height,
-                  const Scene &scene)
+                  const std::string &scene_file)
 {
+    Scene scene = load_scene_from_file(scene_file);
+
+    // TODO: the scene does not fill the entire preview window
     sf::RenderWindow window(sf::VideoMode(static_cast<unsigned int>(width),
                                           static_cast<unsigned int>(height),
                                           32),
@@ -208,40 +212,47 @@ void preview_mode(const size_t width,
     const float half_width = static_cast<float>(width) * 0.5f;
     const float half_height = static_cast<float>(height) * 0.5f;
 
+    int k = 0;
+
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
                 window.close();
+            } else if (event.type == sf::Event::KeyPressed) {
+                scene = load_scene_from_file(scene_file);
+                std::memset(buffer.get(), 0, sizeof(sf::Uint8) * width * height * 4);
             }
         }
 
         const size_t row = rand() % height;
 
         for (size_t col = 0; col < width; ++col) {
-            const vec3<float> p = { static_cast<float>(col) - half_width,
-                                    static_cast<float>(row) - half_height,
-                                    0.0f };
-
+            const vec3<float> ray = { static_cast<float>(col) - half_width,
+                                      static_cast<float>(row) - half_height,
+                                      0.0f };
             const color pixel_color =
                 march(static_cast<float>(col) - half_width,
                       static_cast<float>(row) - half_height,
                       scene,
-                      normalize(p - scene.eye));
+                      normalize(ray - scene.eye));
 
             buffer[row * width * 4 + col * 4 + 0] = static_cast<sf::Uint8>(pixel_color.v[0] * 255.0f);
             buffer[row * width * 4 + col * 4 + 1] = static_cast<sf::Uint8>(pixel_color.v[1] * 255.0f);
             buffer[row * width * 4 + col * 4 + 2] = static_cast<sf::Uint8>(pixel_color.v[2] * 255.0f);
             buffer[row * width * 4 + col * 4 + 3] = 255;
-
-            texture.update(buffer.get());
         }
 
-        sprite.setTexture(texture);
+        if (k == 0) {
+            texture.update(buffer.get());
+            sprite.setTexture(texture);
 
-        window.clear();
-        window.draw(sprite);
-        window.display();
+            window.clear();
+            window.draw(sprite);
+            window.display();
+        }
+
+        k = (k + 1) % 10;
     }
 }
 
@@ -259,14 +270,11 @@ int main(int argc, char *argv[]) {
                                                ? optional<std::string>(argv[2])
                                                : optional<std::string>();
 
-    const auto scene = load_scene_from_file(scene_file);
-
-    std::cout << scene << std::endl;
-
     if (output_file) {
+        const auto scene = load_scene_from_file(scene_file);
         file_render_mode(width, height, *output_file, scene);
     } else {
-        preview_mode(width, height, scene);
+        preview_mode(width, height, scene_file);
     }
 
     return 0;
