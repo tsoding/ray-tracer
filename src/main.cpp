@@ -9,12 +9,15 @@
 #include <sstream>
 #include <numeric>
 #include <algorithm>
+#include <experimental/optional>             // NOLINT
 
 #include <SFML/Graphics.hpp>
 
 #include "./color.hpp"
 #include "./mat4x4.hpp"
 #include "./vec.hpp"
+
+using std::experimental::optional;
 
 template <typename T>
 using vec3 = vec<T, 3>;
@@ -244,31 +247,28 @@ const Scene load_scene_from_file(const std::string &filename) {
     return scene;
 }
 
-int main(int argc, char *argv[]) {
-    const size_t width = 800, height = 600;
+void file_render_mode(const size_t width,
+                      const size_t height,
+                      const std::string &output_file,
+                      const Scene &scene)
+{
+    std::unique_ptr<color[]> display(new color[width * height]);
+    render_scene(display.get(), width, height, scene);
+    save_display_to_file(display.get(), width, height, output_file);
+}
 
-    if (argc < 3) {
-        std::cerr << "./ray-tracer <input-file> <output-file>"
-                  << std::endl;
-        return -1;
-    }
-
-    const std::string input_file(argv[1]);
-    const std::string output_file(argv[2]);
-
-    auto scene = load_scene_from_file(input_file);
-
-    std::cout << scene << std::endl;
-
-    std::array<color, width * height> display;
-    (void) display;
-
-    sf::RenderWindow window(sf::VideoMode(width, height, 32),
+void preview_mode(const size_t width,
+                  const size_t height,
+                  const Scene &scene)
+{
+    sf::RenderWindow window(sf::VideoMode(static_cast<unsigned int>(width),
+                                          static_cast<unsigned int>(height),
+                                          32),
                             "Ray Tracer");
     sf::Texture texture;
-    texture.create(width, height);
+    texture.create(static_cast<unsigned int>(width), static_cast<unsigned int>(height));
     sf::Sprite sprite;
-    std::array<sf::Uint8, width * height * 4> buffer;
+    std::unique_ptr<sf::Uint8[]> buffer(new sf::Uint8[width * height * 4]);
 
     const float half_width = static_cast<float>(width) * 0.5f;
     const float half_height = static_cast<float>(height) * 0.5f;
@@ -302,7 +302,7 @@ int main(int argc, char *argv[]) {
             buffer[row * width * 4 + col * 4 + 2] = static_cast<sf::Uint8>(pixel_color.v[2] * 255.0f);
             buffer[row * width * 4 + col * 4 + 3] = 255;
 
-            texture.update(buffer.data());
+            texture.update(buffer.get());
         }
 
         sprite.setTexture(texture);
@@ -311,9 +311,31 @@ int main(int argc, char *argv[]) {
         window.draw(sprite);
         window.display();
     }
+}
 
-    // render_scene(display.data(), width, height, scene);
-    // save_display_to_file(display.data(), width, height, output_file);
+int main(int argc, char *argv[]) {
+    const size_t width = 800, height = 600;
+
+    if (argc < 2) {
+        std::cerr << "./ray-tracer <scene-file> [output-file]"
+                  << std::endl;
+        return -1;
+    }
+
+    const std::string scene_file(argv[1]);
+    const optional<std::string> output_file = argc >= 3
+                                               ? optional<std::string>(argv[2])
+                                               : optional<std::string>();
+
+    const auto scene = load_scene_from_file(scene_file);
+
+    std::cout << scene << std::endl;
+
+    if (output_file) {
+        file_render_mode(width, height, *output_file, scene);
+    } else {
+        preview_mode(width, height, scene);
+    }
 
     return 0;
 }
