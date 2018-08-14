@@ -6,10 +6,11 @@
 ## Quick Start
 
 ```console
-$ nix-shell         # Only if you are on NixOS
+$ nix-shell                            # Only if you are on NixOS
 $ mkdir build && cd build/
 $ cmake ..
 $ make
-$ ./ray-tracer ../scene.txt
-$ feh output.png
+$ ./ray-tracer ../scene.txt            # for preview mode
+$ ./ray-tracer ../scene.txt output.ppm # for final rendering
+$ feh output.ppm
 ```
