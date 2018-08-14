@@ -219,6 +219,7 @@ void preview_mode(const size_t width,
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
                 window.close();
+                // TODO: reload scene on a particular key
             } else if (event.type == sf::Event::KeyPressed) {
                 scene = load_scene_from_file(scene_file);
                 std::memset(buffer.get(), 0, sizeof(sf::Uint8) * width * height * 4);
