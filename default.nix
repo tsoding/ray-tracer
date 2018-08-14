@@ -4,6 +4,8 @@ with import <nixpkgs> {}; {
         buildInputs = [ stdenv
                         gcc7
                         imagemagick
+                        sfml
+                        cmake
                       ];
     };
 }

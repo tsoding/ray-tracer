@@ -3,3 +3,4 @@ ray-tracer.dSYM/
 *.ppm
 *.png
 cpplint.py
+build/

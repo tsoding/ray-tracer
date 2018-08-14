@@ -1,5 +1,6 @@
 #include <cmath>
 #include <cstdint>
+#include <cstring>
 
 #include <array>
 #include <fstream>
@@ -9,10 +10,15 @@
 #include <sstream>
 #include <numeric>
 #include <algorithm>
+#include <experimental/optional>             // NOLINT
+
+#include <SFML/Graphics.hpp>
 
 #include "./color.hpp"
 #include "./mat4x4.hpp"
 #include "./vec.hpp"
+
+using std::experimental::optional;
 
 template <typename T>
 using vec3 = vec<T, 3>;
@@ -41,49 +47,10 @@ std::ostream& operator<<(std::ostream& os, const Sphere&sphere) {
               << "}";
 }
 
-struct Cuboid {
-    vec3<float> trans;
-    vec3<float> rot;
-    vec3<float> scale;
-    color c;
-};
-
-mat4x4<float> inverse_mat_of_cuboid(const Cuboid &cuboid) {
-    const std::vector<mat4x4<float>> mts = {
-        rot_z_mat(-cuboid.rot.v[2]),
-        rot_y_mat(-cuboid.rot.v[1]),
-        rot_x_mat(-cuboid.rot.v[0]),
-        scale_mat(recip(cuboid.scale)),
-        trans_mat(cuboid.trans * -1.0f)
-    };
-
-    mat4x4<float> result = id_mat();
-
-    for (const auto &m : mts) {
-        result = dot_mat4x4(result, m);
-    }
-
-    return result;
-}
-
-bool is_point_inside_of_cuboid(const vec3<float> &p,
-                               const mat4x4<float> &inverse_mat) {
-    const vec3<float> p1 = dot(inverse_mat, p);
-
-    for (size_t i = 0; i < 3; ++i) {
-        if (p1.v[i] > 0.5f || p1.v[i] < -0.5f) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
 struct Scene {
     vec3<float> eye;
     std::vector<Sphere> spheres;
     std::vector<Wall> walls;
-    std::vector<Cuboid> cuboids;
 };
 
 std::ostream& operator<<(std::ostream& os, const Scene&scene) {
@@ -139,7 +106,6 @@ float color_factor(size_t steps, size_t step_count) {
 
 color march(float x, float y,
             const Scene &scene,
-            const std::vector<mat4x4<float>> &cuboid_inverse_mats,
             vec3<float> dir) {
     vec3<float> ray = {x, y, 0.0f};
     size_t step_count = 600;
@@ -159,13 +125,6 @@ color march(float x, float y,
                 return wall.c * color_factor(i, step_count);
             }
         }
-
-        // TODO(#38): cuboid is rendered incorrectly
-        for (size_t i = 0; i < scene.cuboids.size(); ++i) {
-            if (is_point_inside_of_cuboid(ray, cuboid_inverse_mats[i])) {
-                return scene.cuboids[i].c * color_factor(i, step_count);
-            }
-        }
     }
 
     return {0.0f, 0.0f, 0.0f};
@@ -176,14 +135,8 @@ void render_scene(color *display, size_t width, size_t height,
     const float half_width = static_cast<float>(width) * 0.5f;
     const float half_height = static_cast<float>(height) * 0.5f;
 
-    std::vector<mat4x4<float>> cuboid_inverse_mats;
-
-    for (const auto &cuboid : scene.cuboids) {
-        cuboid_inverse_mats.push_back(inverse_mat_of_cuboid(cuboid));
-    }
-
     for (size_t row = 0; row < height; ++row) {
-        // std::cout << "Row " << row << std::endl;
+        std::cout << "Row " << row << std::endl;
         for (size_t col = 0; col < width; ++col) {
             const vec3<float> p = { static_cast<float>(col) - half_width,
                                     static_cast<float>(row) - half_height,
@@ -193,7 +146,6 @@ void render_scene(color *display, size_t width, size_t height,
                 march(static_cast<float>(col) - half_width,
                       static_cast<float>(row) - half_height,
                       scene,
-                      cuboid_inverse_mats,
                       normalize(p - scene.eye));
         }
     }
@@ -225,42 +177,107 @@ const Scene load_scene_from_file(const std::string &filename) {
                     {plane1, plane2, plane3, plane4},
                     color_from_hex(color_hex).value_or(color{1.0f, 1.0f, 1.0f})
                 });
-        } else if (type == "c") {  // cuboid
-            Cuboid cuboid;
-            std::string c;
-
-            iss >> cuboid.trans
-                >> cuboid.rot
-                >> cuboid.scale
-                >> c;
-            cuboid.c = color_from_hex(c).value_or(color{1.0f, 1.0f, 1.0f});
-
-            scene.cuboids.push_back(cuboid);
         }
     }
 
     return scene;
 }
 
+void file_render_mode(const size_t width,
+                      const size_t height,
+                      const std::string &output_file,
+                      const Scene &scene)
+{
+    std::unique_ptr<color[]> display(new color[width * height]);
+    render_scene(display.get(), width, height, scene);
+    save_display_to_file(display.get(), width, height, output_file);
+}
+
+void preview_mode(const size_t width,
+                  const size_t height,
+                  const std::string &scene_file)
+{
+    Scene scene = load_scene_from_file(scene_file);
+
+    sf::RenderWindow window(sf::VideoMode(static_cast<unsigned int>(width),
+                                          static_cast<unsigned int>(height),
+                                          32),
+                            "Ray Tracer");
+    sf::Texture texture;
+    texture.create(static_cast<unsigned int>(width), static_cast<unsigned int>(height));
+    sf::Sprite sprite;
+    std::unique_ptr<sf::Uint8[]> buffer(new sf::Uint8[width * height * 4]);
+
+    const float half_width = static_cast<float>(width) * 0.5f;
+    const float half_height = static_cast<float>(height) * 0.5f;
+
+    int k = 0;
+
+    while (window.isOpen()) {
+        sf::Event event;
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) {
+                window.close();
+            } else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::R) {
+                scene = load_scene_from_file(scene_file);
+                std::memset(buffer.get(), 0, sizeof(sf::Uint8) * width * height * 4);
+            } else if(event.type == sf::Event::Resized) {
+                sf::Vector2f size = static_cast<sf::Vector2f>(window.getSize());
+                window.setView(sf::View(sf::FloatRect(0.f, 0.f, size.x, size.y)));
+            }
+        }
+
+        const size_t row = static_cast<size_t>(rand()) % height;
+
+        for (size_t col = 0; col < width; ++col) {
+            const vec3<float> ray = { static_cast<float>(col) - half_width,
+                                      static_cast<float>(row) - half_height,
+                                      0.0f };
+            const color pixel_color =
+                march(static_cast<float>(col) - half_width,
+                      static_cast<float>(row) - half_height,
+                      scene,
+                      normalize(ray - scene.eye));
+
+            buffer[row * width * 4 + col * 4 + 0] = static_cast<sf::Uint8>(pixel_color.v[0] * 255.0f);
+            buffer[row * width * 4 + col * 4 + 1] = static_cast<sf::Uint8>(pixel_color.v[1] * 255.0f);
+            buffer[row * width * 4 + col * 4 + 2] = static_cast<sf::Uint8>(pixel_color.v[2] * 255.0f);
+            buffer[row * width * 4 + col * 4 + 3] = 255;
+        }
+
+        if (k == 0) {
+            texture.update(buffer.get());
+            sprite.setTexture(texture);
+
+            window.clear();
+            window.draw(sprite);
+            window.display();
+        }
+
+        k = (k + 1) % 10;
+    }
+}
+
 int main(int argc, char *argv[]) {
     const size_t width = 800, height = 600;
-    std::array<color, width * height> display;
 
-    if (argc < 3) {
-        std::cerr << "./ray-tracer <input-file> <output-file>"
+    if (argc < 2) {
+        std::cerr << "./ray-tracer <scene-file> [output-file]"
                   << std::endl;
         return -1;
     }
 
-    const std::string input_file(argv[1]);
-    const std::string output_file(argv[2]);
+    const std::string scene_file(argv[1]);
+    const optional<std::string> output_file = argc >= 3
+                                               ? optional<std::string>(argv[2])
+                                               : optional<std::string>();
 
-    auto scene = load_scene_from_file(input_file);
-
-    std::cout << scene << std::endl;
-
-    render_scene(display.data(), width, height, scene);
-    save_display_to_file(display.data(), width, height, output_file);
+    if (output_file) {
+        const auto scene = load_scene_from_file(scene_file);
+        file_render_mode(width, height, *output_file, scene);
+    } else {
+        preview_mode(width, height, scene_file);
+    }
 
     return 0;
 }
