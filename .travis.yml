@@ -1,8 +1,14 @@
 dist: trusty
 language: cpp
 compiler:
-  - clang
-  # TODO(#21): gcc is not supported on Travis CI
-  # - gcc
+  # TODO(#47): Travis build doesn't supported clang
+  # - clang
+  - gcc
+before_install:
+  - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+  - sudo apt-get update -qq
+install:
+  - sudo apt-get install -qq g++-6
+  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-6 90
 script:
   - make
