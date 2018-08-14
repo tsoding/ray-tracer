@@ -7,7 +7,9 @@
 
 ```console
 $ nix-shell         # Only if you are on NixOS
-$ make              # To only build and lint the application
-$ make trace        # To run the ray tracer (also builds the project)
+$ mkdir build && cd build/
+$ cmake ..
+$ make
+$ ./ray-tracer ../scene.txt
 $ feh output.png
 ```

@@ -10,6 +10,8 @@
 #include <numeric>
 #include <algorithm>
 
+#include <SFML/Graphics.hpp>
+
 #include "./color.hpp"
 #include "./mat4x4.hpp"
 #include "./vec.hpp"
@@ -244,7 +246,6 @@ const Scene load_scene_from_file(const std::string &filename) {
 
 int main(int argc, char *argv[]) {
     const size_t width = 800, height = 600;
-    std::array<color, width * height> display;
 
     if (argc < 3) {
         std::cerr << "./ray-tracer <input-file> <output-file>"
@@ -259,8 +260,60 @@ int main(int argc, char *argv[]) {
 
     std::cout << scene << std::endl;
 
-    render_scene(display.data(), width, height, scene);
-    save_display_to_file(display.data(), width, height, output_file);
+    std::array<color, width * height> display;
+    (void) display;
+
+    sf::RenderWindow window(sf::VideoMode(width, height, 32),
+                            "Ray Tracer");
+    sf::Texture texture;
+    texture.create(width, height);
+    sf::Sprite sprite;
+    std::array<sf::Uint8, width * height * 4> buffer;
+
+    const float half_width = static_cast<float>(width) * 0.5f;
+    const float half_height = static_cast<float>(height) * 0.5f;
+
+    const std::vector<mat4x4<float>> id = {id_mat()};
+
+    while (window.isOpen()) {
+        sf::Event event;
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) {
+                window.close();
+            }
+        }
+
+        const size_t row = rand() % height;
+
+        for (size_t col = 0; col < width; ++col) {
+            const vec3<float> p = { static_cast<float>(col) - half_width,
+                                    static_cast<float>(row) - half_height,
+                                    0.0f };
+
+            const color pixel_color =
+                march(static_cast<float>(col) - half_width,
+                      static_cast<float>(row) - half_height,
+                      scene,
+                      id,
+                      normalize(p - scene.eye));
+
+            buffer[row * width * 4 + col * 4 + 0] = static_cast<sf::Uint8>(pixel_color.v[0] * 255.0f);
+            buffer[row * width * 4 + col * 4 + 1] = static_cast<sf::Uint8>(pixel_color.v[1] * 255.0f);
+            buffer[row * width * 4 + col * 4 + 2] = static_cast<sf::Uint8>(pixel_color.v[2] * 255.0f);
+            buffer[row * width * 4 + col * 4 + 3] = 255;
+
+            texture.update(buffer.data());
+        }
+
+        sprite.setTexture(texture);
+
+        window.clear();
+        window.draw(sprite);
+        window.display();
+    }
+
+    // render_scene(display.data(), width, height, scene);
+    // save_display_to_file(display.data(), width, height, output_file);
 
     return 0;
 }
