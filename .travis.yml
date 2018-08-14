@@ -1,7 +1,7 @@
 dist: trusty
 language: cpp
 compiler:
-  # TODO: Travis build doesn't supported clang
+  # TODO(#47): Travis build doesn't supported clang
   # - clang
   - gcc
 before_install:
