@@ -1,5 +1,9 @@
 dist: trusty
 language: cpp
+addons:
+  apt:
+    packages:
+      - libsfml-dev
 compiler:
   - clang
   - gcc
