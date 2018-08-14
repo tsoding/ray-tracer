@@ -7,7 +7,7 @@ find_package(SFML REQUIRED system window graphics)
 
 include_directories(${SFML_INCLUDE_DIR})
 
-# TODO: cpplint is not performed in cmake build
+# TODO(#51): cpplint is not performed in cmake build
 
 set(CMAKE_CXX_FLAGS
   "${CMAKE_CXX_FLAGS} \
