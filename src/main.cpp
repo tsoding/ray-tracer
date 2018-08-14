@@ -199,7 +199,6 @@ void preview_mode(const size_t width,
 {
     Scene scene = load_scene_from_file(scene_file);
 
-    // TODO: the scene does not fill the entire preview window
     sf::RenderWindow window(sf::VideoMode(static_cast<unsigned int>(width),
                                           static_cast<unsigned int>(height),
                                           32),
