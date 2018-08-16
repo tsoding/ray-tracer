@@ -5,6 +5,7 @@
 #include <array>
 #include <fstream>
 #include <iostream>
+#include <iomanip>
 #include <string>
 #include <vector>
 #include <random>
@@ -219,8 +220,7 @@ void preview_mode(const size_t width,
     const float half_width = static_cast<float>(width) * 0.5f;
     const float half_height = static_cast<float>(height) * 0.5f;
 
-    int k = 0;
-    size_t i = 0;
+    size_t k = 0, i = 0;
 
     while (window.isOpen()) {
         sf::Event event;
@@ -257,7 +257,14 @@ void preview_mode(const size_t width,
         if (i < ns.size()) {
             if (i == 0) {
                 std::shuffle(ns.begin(), ns.end(), gen);
+                std::cout << "\rRendering..." << std::flush;
             }
+
+            std::cout << "\rRendering... "
+                << std::fixed << std::setprecision(1)
+                << (100*i)/static_cast<float>(height)
+                << std::left << std::setfill(' ') << std::setw(2)
+                << "%" << std::flush;
 
             const size_t row = ns[i++];
 
@@ -276,6 +283,9 @@ void preview_mode(const size_t width,
                 buffer[row * width * 4 + col * 4 + 2] = static_cast<sf::Uint8>(pixel_color.v[2] * 255.0f);
                 buffer[row * width * 4 + col * 4 + 3] = 255;
             }
+        } else if (i == ns.size()) {
+            ++i;
+            std::cout << "\rRendering... 100.0%" << std::endl;
         }
 
         if (k == 0) {
