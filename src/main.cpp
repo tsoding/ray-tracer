@@ -7,6 +7,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <random>
 #include <sstream>
 #include <numeric>
 #include <algorithm>
@@ -197,6 +198,10 @@ void preview_mode(const size_t width,
                   const size_t height,
                   const std::string &scene_file)
 {
+    std::mt19937 gen{ std::random_device{}() };
+    std::vector<size_t> ns(height);
+    std::iota(ns.begin(), ns.end(), 0);
+
     Scene scene = load_scene_from_file(scene_file);
 
     sf::RenderWindow window(sf::VideoMode(static_cast<unsigned int>(width),
@@ -212,6 +217,7 @@ void preview_mode(const size_t width,
     const float half_height = static_cast<float>(height) * 0.5f;
 
     int k = 0;
+    size_t i = 0;
 
     while (window.isOpen()) {
         sf::Event event;
@@ -235,6 +241,7 @@ void preview_mode(const size_t width,
                 case sf::Keyboard::R:
                     scene = load_scene_from_file(scene_file);
                     std::memset(buffer.get(), 0, sizeof(sf::Uint8) * width * height * 4);
+                    i = 0;
                     break;
                 default: break;
                 }
@@ -244,22 +251,28 @@ void preview_mode(const size_t width,
             }
         }
 
-        const size_t row = static_cast<size_t>(rand()) % height;
+        if (i < ns.size()) {
+            if (i == 0) {
+                std::shuffle(ns.begin(), ns.end(), gen);
+            }
 
-        for (size_t col = 0; col < width; ++col) {
-            const vec3<float> ray = { static_cast<float>(col) - half_width,
-                                      static_cast<float>(row) - half_height,
-                                      0.0f };
-            const color pixel_color =
-                march(static_cast<float>(col) - half_width,
-                      static_cast<float>(row) - half_height,
-                      scene,
-                      normalize(ray - scene.eye));
+            const size_t row = ns[i++];
 
-            buffer[row * width * 4 + col * 4 + 0] = static_cast<sf::Uint8>(pixel_color.v[0] * 255.0f);
-            buffer[row * width * 4 + col * 4 + 1] = static_cast<sf::Uint8>(pixel_color.v[1] * 255.0f);
-            buffer[row * width * 4 + col * 4 + 2] = static_cast<sf::Uint8>(pixel_color.v[2] * 255.0f);
-            buffer[row * width * 4 + col * 4 + 3] = 255;
+            for (size_t col = 0; col < width; ++col) {
+                const vec3<float> ray = { static_cast<float>(col) - half_width,
+                                          static_cast<float>(row) - half_height,
+                                          0.0f };
+                const color pixel_color =
+                    march(static_cast<float>(col) - half_width,
+                          static_cast<float>(row) - half_height,
+                          scene,
+                          normalize(ray - scene.eye));
+
+                buffer[row * width * 4 + col * 4 + 0] = static_cast<sf::Uint8>(pixel_color.v[0] * 255.0f);
+                buffer[row * width * 4 + col * 4 + 1] = static_cast<sf::Uint8>(pixel_color.v[1] * 255.0f);
+                buffer[row * width * 4 + col * 4 + 2] = static_cast<sf::Uint8>(pixel_color.v[2] * 255.0f);
+                buffer[row * width * 4 + col * 4 + 3] = 255;
+            }
         }
 
         if (k == 0) {
