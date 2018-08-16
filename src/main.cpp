@@ -216,14 +216,31 @@ void preview_mode(const size_t width,
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed) {
+            switch (event.type) {
+            case sf::Event::Closed: {
                 window.close();
-            } else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::R) {
-                scene = load_scene_from_file(scene_file);
-                std::memset(buffer.get(), 0, sizeof(sf::Uint8) * width * height * 4);
-            } else if(event.type == sf::Event::Resized) {
+                break;
+            }
+            case sf::Event::Resized: {
                 sf::Vector2f size = static_cast<sf::Vector2f>(window.getSize());
                 window.setView(sf::View(sf::FloatRect(0.f, 0.f, size.x, size.y)));
+                break;
+            }
+            case sf::Event::KeyPressed: {
+                switch (event.key.code) {
+                case sf::Keyboard::Q:
+                case sf::Keyboard::Escape:
+                    window.close();
+                    break;
+                case sf::Keyboard::R:
+                    scene = load_scene_from_file(scene_file);
+                    std::memset(buffer.get(), 0, sizeof(sf::Uint8) * width * height * 4);
+                    break;
+                default: break;
+                }
+                break;
+            }
+            default: break;
             }
         }
 
