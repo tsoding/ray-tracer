@@ -211,6 +211,8 @@ void preview_mode(const size_t width,
                             "Ray Tracer");
     window.setFramerateLimit(0);
     window.setVerticalSyncEnabled(true);
+    window.clear(sf::Color(0,0,0));
+    window.display();
 
     const size_t textureSize = width * height * 4;
 
