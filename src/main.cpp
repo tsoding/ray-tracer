@@ -268,7 +268,7 @@ void preview_mode(const size_t width,
 
             std::cout << "\rRendering... "
                 << std::fixed << std::setprecision(1)
-                << (100*i)/static_cast<float>(height)
+                << static_cast<float>(100*i)/static_cast<float>(height)
                 << std::left << std::setfill(' ') << std::setw(2)
                 << "%" << std::flush;
 
