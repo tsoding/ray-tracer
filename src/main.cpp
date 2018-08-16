@@ -208,6 +208,9 @@ void preview_mode(const size_t width,
                                           static_cast<unsigned int>(height),
                                           32),
                             "Ray Tracer");
+    window.setFramerateLimit(0);
+    window.setVerticalSyncEnabled(true);
+
     sf::Texture texture;
     texture.create(static_cast<unsigned int>(width), static_cast<unsigned int>(height));
     sf::Sprite sprite;
