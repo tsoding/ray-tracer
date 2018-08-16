@@ -212,10 +212,14 @@ void preview_mode(const size_t width,
     window.setFramerateLimit(0);
     window.setVerticalSyncEnabled(true);
 
+    const size_t textureSize = width * height * 4;
+
+    std::vector<sf::Uint8> buffer(textureSize, 0);
+
     sf::Texture texture;
     texture.create(static_cast<unsigned int>(width), static_cast<unsigned int>(height));
-    sf::Sprite sprite;
-    std::unique_ptr<sf::Uint8[]> buffer(new sf::Uint8[width * height * 4]);
+
+    sf::Sprite sprite(texture, sf::IntRect(0, 0, static_cast<int>(width), static_cast<int>(height)));
 
     const float half_width = static_cast<float>(width) * 0.5f;
     const float half_height = static_cast<float>(height) * 0.5f;
@@ -243,7 +247,7 @@ void preview_mode(const size_t width,
                     break;
                 case sf::Keyboard::R:
                     scene = load_scene_from_file(scene_file);
-                    std::memset(buffer.get(), 0, sizeof(sf::Uint8) * width * height * 4);
+                    std::fill(buffer.begin(), buffer.end(), 0);
                     i = 0;
                     break;
                 default: break;
@@ -289,7 +293,7 @@ void preview_mode(const size_t width,
         }
 
         if (k == 0) {
-            texture.update(buffer.get());
+            texture.update(buffer.data());
             sprite.setTexture(texture);
 
             window.clear();
