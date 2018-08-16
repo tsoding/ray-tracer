@@ -5,8 +5,10 @@
 #include <array>
 #include <fstream>
 #include <iostream>
+#include <iomanip>
 #include <string>
 #include <vector>
+#include <random>
 #include <sstream>
 #include <numeric>
 #include <algorithm>
@@ -197,56 +199,103 @@ void preview_mode(const size_t width,
                   const size_t height,
                   const std::string &scene_file)
 {
+    std::mt19937 gen{ std::random_device{}() };
+    std::vector<size_t> ns(height);
+    std::iota(ns.begin(), ns.end(), 0);
+
     Scene scene = load_scene_from_file(scene_file);
 
     sf::RenderWindow window(sf::VideoMode(static_cast<unsigned int>(width),
                                           static_cast<unsigned int>(height),
                                           32),
                             "Ray Tracer");
+    window.setFramerateLimit(0);
+    window.setVerticalSyncEnabled(true);
+    window.clear(sf::Color(0,0,0));
+    window.display();
+
+    const size_t textureSize = width * height * 4;
+
+    std::vector<sf::Uint8> buffer(textureSize, 0);
+
     sf::Texture texture;
     texture.create(static_cast<unsigned int>(width), static_cast<unsigned int>(height));
-    sf::Sprite sprite;
-    std::unique_ptr<sf::Uint8[]> buffer(new sf::Uint8[width * height * 4]);
+
+    sf::Sprite sprite(texture, sf::IntRect(0, 0, static_cast<int>(width), static_cast<int>(height)));
 
     const float half_width = static_cast<float>(width) * 0.5f;
     const float half_height = static_cast<float>(height) * 0.5f;
 
-    int k = 0;
+    size_t k = 0, i = 0;
 
     while (window.isOpen()) {
         sf::Event event;
         while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed) {
+            switch (event.type) {
+            case sf::Event::Closed: {
                 window.close();
-            } else if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::R) {
-                scene = load_scene_from_file(scene_file);
-                std::memset(buffer.get(), 0, sizeof(sf::Uint8) * width * height * 4);
-            } else if(event.type == sf::Event::Resized) {
+                break;
+            }
+            case sf::Event::Resized: {
                 sf::Vector2f size = static_cast<sf::Vector2f>(window.getSize());
                 window.setView(sf::View(sf::FloatRect(0.f, 0.f, size.x, size.y)));
+                break;
+            }
+            case sf::Event::KeyPressed: {
+                switch (event.key.code) {
+                case sf::Keyboard::Q:
+                case sf::Keyboard::Escape:
+                    window.close();
+                    break;
+                case sf::Keyboard::R:
+                    scene = load_scene_from_file(scene_file);
+                    std::fill(buffer.begin(), buffer.end(), 0);
+                    i = 0;
+                    break;
+                default: break;
+                }
+                break;
+            }
+            default: break;
             }
         }
 
-        const size_t row = static_cast<size_t>(rand()) % height;
+        if (i < ns.size()) {
+            if (i == 0) {
+                std::shuffle(ns.begin(), ns.end(), gen);
+                std::cout << "\rRendering..." << std::flush;
+            }
 
-        for (size_t col = 0; col < width; ++col) {
-            const vec3<float> ray = { static_cast<float>(col) - half_width,
-                                      static_cast<float>(row) - half_height,
-                                      0.0f };
-            const color pixel_color =
-                march(static_cast<float>(col) - half_width,
-                      static_cast<float>(row) - half_height,
-                      scene,
-                      normalize(ray - scene.eye));
+            std::cout << "\rRendering... "
+                << std::fixed << std::setprecision(1)
+                << static_cast<float>(100*i)/static_cast<float>(height)
+                << std::left << std::setfill(' ') << std::setw(2)
+                << "%" << std::flush;
 
-            buffer[row * width * 4 + col * 4 + 0] = static_cast<sf::Uint8>(pixel_color.v[0] * 255.0f);
-            buffer[row * width * 4 + col * 4 + 1] = static_cast<sf::Uint8>(pixel_color.v[1] * 255.0f);
-            buffer[row * width * 4 + col * 4 + 2] = static_cast<sf::Uint8>(pixel_color.v[2] * 255.0f);
-            buffer[row * width * 4 + col * 4 + 3] = 255;
+            const size_t row = ns[i++];
+
+            for (size_t col = 0; col < width; ++col) {
+                const vec3<float> ray = { static_cast<float>(col) - half_width,
+                                          static_cast<float>(row) - half_height,
+                                          0.0f };
+                const color pixel_color =
+                    march(static_cast<float>(col) - half_width,
+                          static_cast<float>(row) - half_height,
+                          scene,
+                          normalize(ray - scene.eye));
+
+                buffer[row * width * 4 + col * 4 + 0] = static_cast<sf::Uint8>(pixel_color.v[0] * 255.0f);
+                buffer[row * width * 4 + col * 4 + 1] = static_cast<sf::Uint8>(pixel_color.v[1] * 255.0f);
+                buffer[row * width * 4 + col * 4 + 2] = static_cast<sf::Uint8>(pixel_color.v[2] * 255.0f);
+                buffer[row * width * 4 + col * 4 + 3] = 255;
+            }
+        } else if (i == ns.size()) {
+            ++i;
+            std::cout << "\rRendering... 100.0%" << std::endl;
         }
 
         if (k == 0) {
-            texture.update(buffer.get());
+            texture.update(buffer.data());
             sprite.setTexture(texture);
 
             window.clear();

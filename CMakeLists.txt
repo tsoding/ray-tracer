@@ -9,15 +9,17 @@ include_directories(${SFML_INCLUDE_DIR})
 
 # TODO(#51): cpplint is not performed in cmake build
 
-set(CMAKE_CXX_FLAGS
-  "${CMAKE_CXX_FLAGS} \
-   -Wall \
-   -Werror \
-   -Wconversion \
-   -Wno-missing-braces \
-   -Wunused-variable \
-   -pedantic \
-   -std=c++17")
-
 add_executable(ray-tracer src/main.cpp)
+
+set_target_properties(ray-tracer PROPERTIES
+  CXX_STANDARD 17)
+
+target_compile_options(ray-tracer PRIVATE
+  -Wall
+  -Werror
+  -Wconversion
+  -Wno-missing-braces
+  -Wunused-variable
+  -pedantic)
+
 target_link_libraries(ray-tracer ${SFML_LIBRARIES})
