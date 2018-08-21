@@ -6,6 +6,9 @@ struct vec {
     T v[N];
 };
 
+template <typename T>
+using vec3 = vec<T, 3>;
+
 template <typename T, size_t N>
 vec<T, N> recip(const vec<T, N> &v) {
     vec<T, N> r;

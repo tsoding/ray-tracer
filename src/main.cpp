@@ -20,20 +20,7 @@
 #include "./color.hpp"
 #include "./mat4x4.hpp"
 #include "./vec.hpp"
-
-template <typename T>
-using vec3 = vec<T, 3>;
-
-using plane = vec<float, 4>;
-
-struct Wall {
-    plane p;
-    color c;
-};
-
-std::ostream& operator<<(std::ostream& os, const Wall&wall) {
-    return os << "Wall{ p" << wall.p << " c" << wall.c << "}";
-}
+#include "./wall.hpp"
 
 struct Sphere {
     vec3<float> center;
@@ -67,9 +54,6 @@ std::ostream& operator<<(std::ostream& os, const Scene&scene) {
     return os << "}" << std::endl;
 }
 
-float dot(const plane &p, const vec3<float> &v) {
-    return p.v[0] * v.v[0] + p.v[1] * v.v[1] + p.v[2] * v.v[2] + p.v[3];
-}
 
 float dot(const vec3<float> &v1, const vec3<float> &v2) {
     return v1.v[0] * v2.v[0] + v1.v[1] * v2.v[1] + v1.v[2] * v2.v[2];

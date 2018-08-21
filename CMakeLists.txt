@@ -8,12 +8,14 @@ find_package(SFML REQUIRED system window graphics)
 include_directories(${SFML_INCLUDE_DIR})
 
 set(RAY_TRACER_SOURCES
-  src/main.cpp)
+  src/main.cpp
+  src/color.hpp
+  src/mat4x4.hpp
+  src/plane.hpp
+  src/vec.hpp
+  src/wall.hpp
+  )
 
-set(RAY_TRACER_HEADERS
-  color.hpp
-  mat4x4.hpp
-  vec.hpp)
 
 add_executable(ray-tracer ${RAY_TRACER_SOURCES})
 
@@ -26,10 +28,11 @@ target_compile_options(ray-tracer PRIVATE
   -Wconversion
   -Wno-missing-braces
   -Wunused-variable
-  -pedantic)
+  -pedantic
+  )
 
 target_link_libraries(ray-tracer ${SFML_LIBRARIES})
 
 include(CppLint)
-add_cpp_lint_target(lint ${RAY_TRACER_SOURCES} ${RAY_TRACER_HEADERS})
+add_cpp_lint_target(lint "${RAY_TRACER_SOURCES}")
 add_dependencies(ray-tracer lint)
