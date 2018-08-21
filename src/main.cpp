@@ -183,11 +183,9 @@ int main(int argc, char *argv[]) {
         : std::string();
 
     if (!output_file.empty()) {
-        std::cout << "load_scene_from_file\n";
         const auto scene = load_scene_from_file(scene_file);
         file_render_mode(width, height, output_file, scene);
     } else {
-        std::cout << "preview_mode\n";
         preview_mode(width, height, scene_file);
     }
 

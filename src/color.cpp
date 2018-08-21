@@ -1,6 +1,7 @@
-#include <string>
 #include <algorithm>
 #include <array>
+#include <memory>
+#include <string>
 
 #include "color.hpp"
 
@@ -38,17 +39,19 @@ static bool is_color_hex_code(const std::string &str) {
     return true;
 }
 
-std::optional<color> color_from_hex(const std::string &str) {
+std::unique_ptr<color> color_from_hex(const std::string &str) {
     if (!is_color_hex_code(str)) {
-        return {};
+        return nullptr;
     }
 
     std::array<int, 6> codes;
     std::transform(str.begin() + 1, str.end(), codes.begin(), digit_hex_to_dec);
 
-    return std::optional<color>({
+    const color hex_color = {
         static_cast<float>(codes[0] * 16 + codes[1]) / 255.0f,
         static_cast<float>(codes[2] * 16 + codes[3]) / 255.0f,
         static_cast<float>(codes[4] * 16 + codes[5]) / 255.0f
-    });
+    };
+
+    return std::make_unique<color>(hex_color);
 }

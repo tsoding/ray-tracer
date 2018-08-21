@@ -41,9 +41,11 @@ const Scene load_scene_from_file(const std::string &filename) {
             std::string color_hex;
             iss >> plane1 >> plane2 >> plane3 >> plane4 >> color_hex;
 
+            const auto hex_color = color_from_hex(color_hex);
+
             scene.walls.push_back({
                     {plane1, plane2, plane3, plane4},
-                    color_from_hex(color_hex).value_or(color{1.0f, 1.0f, 1.0f})
+                    hex_color != nullptr ? *hex_color : color{1.0f, 1.0f, 1.0f}
                 });
         }
     }
