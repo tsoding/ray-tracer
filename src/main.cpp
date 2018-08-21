@@ -131,27 +131,6 @@ color march(float x, float y,
     return {0.0f, 0.0f, 0.0f};
 }
 
-void render_scene(color *display, size_t width, size_t height,
-                  const Scene &scene) {
-    const float half_width = static_cast<float>(width) * 0.5f;
-    const float half_height = static_cast<float>(height) * 0.5f;
-
-    for (size_t row = 0; row < height; ++row) {
-        std::cout << "Row " << row << std::endl;
-        for (size_t col = 0; col < width; ++col) {
-            const vec3<float> p = { static_cast<float>(col) - half_width,
-                                    static_cast<float>(row) - half_height,
-                                    0.0f };
-
-            display[row * width + col] =
-                march(static_cast<float>(col) - half_width,
-                      static_cast<float>(row) - half_height,
-                      scene,
-                      normalize(p - scene.eye));
-        }
-    }
-}
-
 const Scene load_scene_from_file(const std::string &filename) {
     std::ifstream infile(filename);
     Scene scene = {};
@@ -189,7 +168,31 @@ void file_render_mode(const size_t width,
                       const std::string &output_file,
                       const Scene &scene) {
     std::unique_ptr<color[]> display(new color[width * height]);
-    render_scene(display.get(), width, height, scene);
+
+    const float half_width = static_cast<float>(width) * 0.5f;
+    const float half_height = static_cast<float>(height) * 0.5f;
+
+    for (size_t row = 0; row < height; ++row) {
+        std::cout << "\rRendering... "
+            << std::fixed << std::setprecision(1)
+            << static_cast<float>(100 * row) / static_cast<float>(height)
+            << std::left << std::setfill(' ') << std::setw(2)
+            << "%" << std::flush;
+
+        for (size_t col = 0; col < width; ++col) {
+            const vec3<float> p = { static_cast<float>(col) - half_width,
+                                    static_cast<float>(row) - half_height,
+                                    0.0f };
+
+            display[row * width + col] =
+                march(static_cast<float>(col) - half_width,
+                      static_cast<float>(row) - half_height,
+                      scene,
+                      normalize(p - scene.eye));
+        }
+    }
+    std::cout << "\rRendering... 100.0%" << std::endl;
+
     save_display_to_file(display.get(), width, height, output_file);
 }
 
