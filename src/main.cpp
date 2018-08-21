@@ -18,7 +18,6 @@
 #include <SFML/Graphics.hpp>    // NOLINT
 
 #include "./color.hpp"
-#include "./mat4x4.hpp"
 #include "./scene.hpp"
 #include "./sphere.hpp"
 #include "./vec.hpp"
