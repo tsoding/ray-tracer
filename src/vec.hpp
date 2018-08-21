@@ -99,4 +99,12 @@ T sqr_norm(const vec<T, N> &v) {
     return acc;
 }
 
+float dot(const vec3<float> &v1, const vec3<float> &v2) {
+    return v1.v[0] * v2.v[0] + v1.v[1] * v2.v[1] + v1.v[2] * v2.v[2];
+}
+
+vec3<float> normalize(const vec3<float> &v) {
+    return 1.0f / sqrtf(sqr_norm(v)) * v;
+}
+
 #endif  // SRC_VEC_HPP_
