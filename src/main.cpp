@@ -22,7 +22,6 @@
 #include "./scene.hpp"
 #include "./sphere.hpp"
 #include "./vec.hpp"
-#include "./wall.hpp"
 
 void file_render_mode(const size_t width,
                       const size_t height,
@@ -178,15 +177,17 @@ int main(int argc, char *argv[]) {
     }
 
     const std::string scene_file(argv[1]);
-    const std::optional<std::string> output_file =
+    const std::string output_file =
         argc >= 3
-        ? std::optional<std::string>(argv[2])
-        : std::optional<std::string>();
+        ? std::string(argv[2])
+        : std::string();
 
-    if (output_file) {
+    if (!output_file.empty()) {
+        std::cout << "load_scene_from_file\n";
         const auto scene = load_scene_from_file(scene_file);
-        file_render_mode(width, height, *output_file, scene);
+        file_render_mode(width, height, output_file, scene);
     } else {
+        std::cout << "preview_mode\n";
         preview_mode(width, height, scene_file);
     }
 
