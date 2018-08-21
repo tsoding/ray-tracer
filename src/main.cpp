@@ -4,7 +4,7 @@
 
 #include <algorithm>
 #include <array>
-#include <experimental/optional>             // NOLINT
+#include <optional>             // NOLINT
 #include <fstream>
 #include <iomanip>
 #include <iostream>
@@ -20,8 +20,6 @@
 #include "./color.hpp"
 #include "./mat4x4.hpp"
 #include "./vec.hpp"
-
-using std::experimental::optional;
 
 template <typename T>
 using vec3 = vec<T, 3>;
@@ -316,9 +314,10 @@ int main(int argc, char *argv[]) {
     }
 
     const std::string scene_file(argv[1]);
-    const optional<std::string> output_file = argc >= 3
-                                               ? optional<std::string>(argv[2])
-                                               : optional<std::string>();
+    const std::optional<std::string> output_file =
+        argc >= 3
+        ? std::optional<std::string>(argv[2])
+        : std::optional<std::string>();
 
     if (output_file) {
         const auto scene = load_scene_from_file(scene_file);
