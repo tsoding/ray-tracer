@@ -1,26 +1,19 @@
 #ifndef SRC_VEC_HPP_
 #define SRC_VEC_HPP_
 
+#include <ostream>
+#include <cmath>
+
 template <typename T, size_t N>
 struct vec {
     T v[N];
 };
 
-template <typename T, size_t N>
-vec<T, N> recip(const vec<T, N> &v) {
-    vec<T, N> r;
-    for (size_t i = 0; i < N; ++i) {
-        if (v.v[i] == 0.0f) {
-            r.v[i] = 0.0f;
-        } else {
-            r.v[i] = 1 / v.v[i];
-        }
-    }
-    return r;
-}
+template <typename T>
+using vec3 = vec<T, 3>;
 
 template <typename T, size_t N>
-std::ostream& operator<<(std::ostream& os, const vec<T, N> &vec) {
+inline std::ostream& operator<<(std::ostream& os, const vec<T, N> &vec) {
     os << "{";
     for (size_t i = 0; i < N - 1; i++)
         os << vec.v[i] << ",";
@@ -30,7 +23,7 @@ std::ostream& operator<<(std::ostream& os, const vec<T, N> &vec) {
 }
 
 template <typename T, size_t N>
-std::istream& operator>>(std::istream& is, vec<T, N> &vec) {
+inline std::istream& operator>>(std::istream& is, vec<T, N> &vec) {
     for (size_t i = 0; i < N; ++i) {
         is >> vec.v[i];
     }
@@ -38,7 +31,7 @@ std::istream& operator>>(std::istream& is, vec<T, N> &vec) {
 }
 
 template <typename T, size_t N>
-vec<T, N> operator+(const vec<T, N> &v1, const vec<T, N> &v2) {
+inline vec<T, N> operator+(const vec<T, N> &v1, const vec<T, N> &v2) {
     vec<T, N> result;
 
     for (size_t i = 0; i < N; ++i) {
@@ -49,7 +42,7 @@ vec<T, N> operator+(const vec<T, N> &v1, const vec<T, N> &v2) {
 }
 
 template <typename T, size_t N>
-vec<T, N> operator-(const vec<T, N> &v1, const vec<T, N> &v2) {
+inline vec<T, N> operator-(const vec<T, N> &v1, const vec<T, N> &v2) {
     vec<T, N> result;
 
     for (size_t i = 0; i < N; ++i) {
@@ -60,7 +53,7 @@ vec<T, N> operator-(const vec<T, N> &v1, const vec<T, N> &v2) {
 }
 
 template <typename T, size_t N>
-vec<T, N> &operator+=(vec<T, N> &v1,  // NOLINT(runtime/references)
+inline vec<T, N> &operator+=(vec<T, N> &v1,  // NOLINT(runtime/references)
                       const vec<T, N> &v2) {
     for (size_t i = 0; i < N; ++i) {
         v1.v[i] += v2.v[i];
@@ -70,7 +63,7 @@ vec<T, N> &operator+=(vec<T, N> &v1,  // NOLINT(runtime/references)
 }
 
 template <typename T, size_t N>
-vec<T, N> operator*(const T &s, const vec<T, N> &v) {
+inline vec<T, N> operator*(const T &s, const vec<T, N> &v) {
     vec<T, N> result;
 
     for (size_t i = 0; i < N; ++i) {
@@ -81,12 +74,12 @@ vec<T, N> operator*(const T &s, const vec<T, N> &v) {
 }
 
 template <typename T, size_t N>
-vec<T, N> operator*(const vec<T, N> &v, const T &s) {
+inline vec<T, N> operator*(const vec<T, N> &v, const T &s) {
     return s * v;
 }
 
 template <typename T, size_t N>
-T sqr_norm(const vec<T, N> &v) {
+inline T sqr_norm(const vec<T, N> &v) {
     T acc = T();
 
     for (size_t i = 0; i < N; ++i) {
@@ -94,6 +87,14 @@ T sqr_norm(const vec<T, N> &v) {
     }
 
     return acc;
+}
+
+inline float dot(const vec3<float> &v1, const vec3<float> &v2) {
+    return v1.v[0] * v2.v[0] + v1.v[1] * v2.v[1] + v1.v[2] * v2.v[2];
+}
+
+inline vec3<float> normalize(const vec3<float> &v) {
+    return 1.0f / sqrtf(sqr_norm(v)) * v;
 }
 
 #endif  // SRC_VEC_HPP_
