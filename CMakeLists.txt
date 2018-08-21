@@ -8,11 +8,13 @@ find_package(SFML REQUIRED system window graphics)
 include_directories(${SFML_INCLUDE_DIR})
 
 set(RAY_TRACER_SOURCES
-  src/color.hpp
   src/color.cpp
+  src/color.hpp
   src/main.cpp
   src/mat4x4.hpp
   src/plane.hpp
+  src/scene.cpp
+  src/scene.hpp
   src/sphere.hpp
   src/vec.hpp
   src/wall.hpp
