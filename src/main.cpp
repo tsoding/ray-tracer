@@ -4,7 +4,6 @@
 
 #include <algorithm>
 #include <array>
-#include <optional>             // NOLINT
 #include <fstream>
 #include <iomanip>
 #include <iostream>
