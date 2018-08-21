@@ -67,7 +67,7 @@ color march(float x, float y,
         ray += dir;
 
         for (const auto &sphere : scene.spheres) {
-            if (sqr_norm(sphere.center - ray) < sphere.radius * sphere.radius) {
+            if (is_ray_inside_of_sphere(sphere, ray)) {
                 vec3<float> norm = normalize(ray - sphere.center);
                 dir = normalize(dir - (2 * dot(dir, norm)) * norm);
             }
