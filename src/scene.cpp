@@ -74,7 +74,7 @@ color march(float x, float y,
         }
 
         for (const auto &wall : scene.walls) {
-            if (std::abs(dot(wall.p, ray)) <= 0.5f) {
+            if (is_ray_behind_wall(wall, ray)) {
                 return wall.c * color_factor(i, step_count);
             }
         }

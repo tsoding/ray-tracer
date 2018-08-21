@@ -16,6 +16,7 @@ set(RAY_TRACER_SOURCES
   src/sphere.hpp
   src/vec.hpp
   src/wall.hpp
+  src/wall.cpp
   )
 
 add_executable(ray-tracer ${RAY_TRACER_SOURCES})
