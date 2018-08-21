@@ -2,14 +2,12 @@
 #define SRC_COLOR_HPP_
 
 #include <algorithm>
-#include <experimental/optional>             // NOLINT
 #include <string>
 
 #include "./vec.hpp"
 
 using color = vec<float, 3>;
 
-using std::experimental::optional;
 
 int digit_hex_to_dec(char c) {
     if ('0' <= c && c <= '9') {
@@ -45,7 +43,7 @@ bool is_color_hex_code(const std::string &str) {
     return true;
 }
 
-optional<color> color_from_hex(const std::string &str) {
+std::optional<color> color_from_hex(const std::string &str) {
     if (!is_color_hex_code(str)) {
         return {};
     }
@@ -53,7 +51,7 @@ optional<color> color_from_hex(const std::string &str) {
     std::array<int, 6> codes;
     std::transform(str.begin() + 1, str.end(), codes.begin(), digit_hex_to_dec);
 
-    return optional<color>({
+    return std::optional<color>({
         static_cast<float>(codes[0] * 16 + codes[1]) / 255.0f,
         static_cast<float>(codes[2] * 16 + codes[3]) / 255.0f,
         static_cast<float>(codes[4] * 16 + codes[5]) / 255.0f

@@ -4,6 +4,7 @@ addons:
   apt:
     packages:
       - libsfml-dev
+      - libc++-dev
 compiler:
   - clang
   - gcc
