@@ -19,29 +19,10 @@
 
 #include "./color.hpp"
 #include "./mat4x4.hpp"
+#include "./scene.hpp"
+#include "./sphere.hpp"
 #include "./vec.hpp"
 #include "./wall.hpp"
-#include "./sphere.hpp"
-
-struct Scene {
-    vec3<float> eye;
-    std::vector<Sphere> spheres;
-    std::vector<Wall> walls;
-};
-
-std::ostream& operator<<(std::ostream& os, const Scene&scene) {
-    os << "Scene{" << std::endl
-        << "  Eye:" << scene.eye << std::endl;
-
-    for (const auto&sphere : scene.spheres)
-          std::cout << "  " << sphere << std::endl;
-
-    for (const auto&wall : scene.walls)
-          std::cout << "  " << wall << std::endl;
-
-    return os << "}" << std::endl;
-}
-
 
 float dot(const vec3<float> &v1, const vec3<float> &v2) {
     return v1.v[0] * v2.v[0] + v1.v[1] * v2.v[1] + v1.v[2] * v2.v[2];
