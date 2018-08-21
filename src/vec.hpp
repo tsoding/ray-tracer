@@ -13,19 +13,6 @@ template <typename T>
 using vec3 = vec<T, 3>;
 
 template <typename T, size_t N>
-vec<T, N> recip(const vec<T, N> &v) {
-    vec<T, N> r;
-    for (size_t i = 0; i < N; ++i) {
-        if (v.v[i] == 0.0f) {
-            r.v[i] = 0.0f;
-        } else {
-            r.v[i] = 1 / v.v[i];
-        }
-    }
-    return r;
-}
-
-template <typename T, size_t N>
 std::ostream& operator<<(std::ostream& os, const vec<T, N> &vec) {
     os << "{";
     for (size_t i = 0; i < N - 1; i++)
