@@ -14,6 +14,7 @@ set(RAY_TRACER_SOURCES
   src/scene.cpp
   src/scene.hpp
   src/sphere.hpp
+  src/sphere.cpp
   src/vec.hpp
   src/wall.hpp
   src/wall.cpp

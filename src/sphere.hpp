@@ -8,13 +8,6 @@ struct Sphere {
     float radius;
 };
 
-inline std::ostream& operator<<(std::ostream& os, const Sphere&sphere) {
-    return os << "Sphere{ center "
-              << sphere.center
-              << " radius "
-              << sphere.radius
-              << "}";
-}
-
+std::ostream& operator<<(std::ostream& os, const Sphere&sphere);
 
 #endif  // SPHERE_HPP_
