@@ -12,8 +12,8 @@ before_install:
   - sudo apt-add-repository "deb http://apt.llvm.org/trusty/ llvm-toolchain-trusty-7 main"
   - sudo apt-get update -qq
 install:
-  - sudo apt-get install --allow-unauthenticated -qq g++-6 clang++-7 libc++-7-dev
-  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-6 90
+  - sudo apt-get install --allow-unauthenticated -qq g++-8 clang++-7 libc++-7-dev libstdc++-8-dev
+  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 90
 script:
   - cmake .
   - make
