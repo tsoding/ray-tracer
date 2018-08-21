@@ -2,19 +2,20 @@
 #include <cstdint>
 #include <cstring>
 
+#include <algorithm>
 #include <array>
+#include <experimental/optional>             // NOLINT
 #include <fstream>
-#include <iostream>
 #include <iomanip>
-#include <string>
-#include <vector>
+#include <iostream>
+#include <memory>
+#include <numeric>
 #include <random>
 #include <sstream>
-#include <numeric>
-#include <algorithm>
-#include <experimental/optional>             // NOLINT
+#include <string>
+#include <vector>
 
-#include <SFML/Graphics.hpp>
+#include <SFML/Graphics.hpp>    // NOLINT
 
 #include "./color.hpp"
 #include "./mat4x4.hpp"
@@ -188,8 +189,7 @@ const Scene load_scene_from_file(const std::string &filename) {
 void file_render_mode(const size_t width,
                       const size_t height,
                       const std::string &output_file,
-                      const Scene &scene)
-{
+                      const Scene &scene) {
     std::unique_ptr<color[]> display(new color[width * height]);
     render_scene(display.get(), width, height, scene);
     save_display_to_file(display.get(), width, height, output_file);
@@ -197,9 +197,8 @@ void file_render_mode(const size_t width,
 
 void preview_mode(const size_t width,
                   const size_t height,
-                  const std::string &scene_file)
-{
-    std::mt19937 gen{ std::random_device{}() };
+                  const std::string &scene_file) {
+    std::mt19937 gen { std::random_device {}() };
     std::vector<size_t> ns(height);
     std::iota(ns.begin(), ns.end(), 0);
 
@@ -211,7 +210,7 @@ void preview_mode(const size_t width,
                             "Ray Tracer");
     window.setFramerateLimit(0);
     window.setVerticalSyncEnabled(true);
-    window.clear(sf::Color(0,0,0));
+    window.clear(sf::Color(0, 0, 0));
     window.display();
 
     const size_t textureSize = width * height * 4;

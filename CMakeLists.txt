@@ -7,9 +7,15 @@ find_package(SFML REQUIRED system window graphics)
 
 include_directories(${SFML_INCLUDE_DIR})
 
-# TODO(#51): cpplint is not performed in cmake build
+set(RAY_TRACER_SOURCES
+  src/main.cpp)
 
-add_executable(ray-tracer src/main.cpp)
+set(RAY_TRACER_HEADERS
+  color.hpp
+  mat4x4.hpp
+  vec.hpp)
+
+add_executable(ray-tracer ${RAY_TRACER_SOURCES})
 
 set_target_properties(ray-tracer PROPERTIES
   CXX_STANDARD 17)
@@ -23,3 +29,7 @@ target_compile_options(ray-tracer PRIVATE
   -pedantic)
 
 target_link_libraries(ray-tracer ${SFML_LIBRARIES})
+
+include(CppLint)
+add_cpp_lint_target(lint ${RAY_TRACER_SOURCES} ${RAY_TRACER_HEADERS})
+add_dependencies(ray-tracer lint)
