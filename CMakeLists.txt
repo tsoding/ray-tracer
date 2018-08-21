@@ -11,13 +11,15 @@ set(RAY_TRACER_SOURCES
   src/color.cpp
   src/color.hpp
   src/main.cpp
+  src/ppm.cpp
+  src/ppm.hpp
   src/scene.cpp
   src/scene.hpp
-  src/sphere.hpp
   src/sphere.cpp
+  src/sphere.hpp
   src/vec.hpp
-  src/wall.hpp
   src/wall.cpp
+  src/wall.hpp
   )
 
 add_executable(ray-tracer ${RAY_TRACER_SOURCES})

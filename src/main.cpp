@@ -18,30 +18,11 @@
 #include <SFML/Graphics.hpp>    // NOLINT
 
 #include "./color.hpp"
+#include "./ppm.hpp"
 #include "./scene.hpp"
 #include "./sphere.hpp"
 #include "./vec.hpp"
 #include "./wall.hpp"
-
-void save_display_to_file(const color *display,
-                          size_t width,
-                          size_t height,
-                          const std::string &filepath) {
-    std::ofstream fout(filepath, std::ofstream::out | std::ostream::binary);
-
-    fout << "P6" << std::endl;
-    fout << width << " " << height << std::endl;
-    fout << 255 << std::endl;
-
-    for (size_t row = 0; row < height; ++row) {
-        for (size_t col = 0; col < width; ++col) {
-            for (size_t k = 0; k < 3; ++k) {
-                const float x = 255.0f * display[row * width + col].v[k];
-                fout.put(static_cast<char>(x));
-            }
-        }
-    }
-}
 
 void file_render_mode(const size_t width,
                       const size_t height,
@@ -73,7 +54,7 @@ void file_render_mode(const size_t width,
     }
     std::cout << "\rRendering... 100.0%" << std::endl;
 
-    save_display_to_file(display.get(), width, height, output_file);
+    save_ppm_file(display.get(), width, height, output_file);
 }
 
 void preview_mode(const size_t width,
