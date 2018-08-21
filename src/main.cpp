@@ -21,19 +21,7 @@
 #include "./mat4x4.hpp"
 #include "./vec.hpp"
 #include "./wall.hpp"
-
-struct Sphere {
-    vec3<float> center;
-    float radius;
-};
-
-std::ostream& operator<<(std::ostream& os, const Sphere&sphere) {
-    return os << "Sphere{ center "
-              << sphere.center
-              << " radius "
-              << sphere.radius
-              << "}";
-}
+#include "./sphere.hpp"
 
 struct Scene {
     vec3<float> eye;
