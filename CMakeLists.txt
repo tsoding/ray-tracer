@@ -25,7 +25,7 @@ set(RAY_TRACER_SOURCES
 add_executable(ray-tracer ${RAY_TRACER_SOURCES})
 
 set_target_properties(ray-tracer PROPERTIES
-  CXX_STANDARD 17)
+  CXX_STANDARD 14)
 
 target_compile_options(ray-tracer PRIVATE
   -Wall
