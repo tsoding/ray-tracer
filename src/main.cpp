@@ -15,11 +15,171 @@
 #include <string>
 #include <vector>
 
-#include <SFML/Graphics.hpp>    // NOLINT
+#include <SFML/Graphics.hpp>
 
 #include "./color.hpp"
 #include "./mat4x4.hpp"
 #include "./vec.hpp"
+
+struct Scene;
+
+#include <glad/glad.h>
+#include <SFML/OpenGL.hpp>
+
+std::vector<char> readFile(const std::string &filename) {
+	std::ifstream file(filename, std::ios::ate);
+	if (!file.is_open()) {
+        throw std::runtime_error("failed to open file!");
+    }
+    
+    size_t fileSize = (size_t) file.tellg();
+    std::vector<char> buffer(fileSize);
+    
+    file.seekg(0);
+    file.read(buffer.data(), fileSize);
+    file.close();
+    
+    return buffer;
+}
+
+
+GLuint createShader(const char *string, GLenum shaderType) {
+	GLuint shader = glCreateShader(shaderType);
+	glShaderSource(shader, 1, static_cast<const GLchar **>(&string), nullptr);
+	glCompileShader(shader);
+	
+	GLint success = 0;
+	glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
+	if(success == GL_FALSE) {
+		GLint maxLength = 0;
+		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &maxLength);
+		std::vector<GLchar> errorLog(maxLength);
+		glGetShaderInfoLog(shader, maxLength, &maxLength, &errorLog[0]);
+		glDeleteShader(shader);
+		std::cout << "Shader error log:" << std::endl
+                  << errorLog.data()     << std::endl;
+	}
+
+	return shader;
+}
+
+
+GLuint createShaderProgram(const std::vector<GLuint>& shaders) {
+	GLuint program = glCreateProgram();
+	for(const GLuint &shader: shaders) {
+		glAttachShader(program, shader);
+	}
+	glLinkProgram(program);
+	
+	GLint isLinked = 0;
+	glGetProgramiv(program, GL_LINK_STATUS, (int *)&isLinked);
+	if(isLinked == GL_FALSE) {
+		GLint maxLength = 0;
+		glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength);
+		std::vector<GLchar> infoLog(maxLength);
+		glGetProgramInfoLog(program, maxLength, &maxLength, &infoLog[0]);
+		glDeleteProgram(program);				
+	}
+	
+	for(const GLuint &shader: shaders) {
+		glDetachShader(program, shader);
+	}
+	return program;
+}
+
+double radians(double x) {
+	return x * 180.0 / M_PI;
+}
+
+void previewModeGL(sf::VideoMode videoMode, const Scene &scene) {
+	sf::ContextSettings settings;
+	settings.depthBits = 24;
+	settings.stencilBits = 8;
+	settings.antialiasingLevel = 4;
+	settings.majorVersion = 3;
+	settings.minorVersion = 3;
+	
+	sf::Window window(videoMode, "OpenGL", sf::Style::Default, settings);
+
+	window.setVerticalSyncEnabled(false);
+	window.setActive(true);
+
+	if(!gladLoadGL()) {
+		throw std::runtime_error("failed to create shader module!");
+	}
+	
+	std::cout << "OpenGL " << GLVersion.major << "." << GLVersion.minor << std::endl;
+	
+	glViewport(0, 0, videoMode.width, videoMode.height);
+	glEnable(GL_TEXTURE_2D);
+
+	std::vector<GLuint> shaders;
+	std::vector<char> vertexShaderString = readFile(std::string("shader.vert"));
+	vertexShaderString.push_back('\0');
+	std::vector<char> fragmentShaderString = readFile(std::string("shader.frag"));
+	fragmentShaderString.push_back('\0');	
+	
+	shaders.push_back(createShader(vertexShaderString.data(), GL_VERTEX_SHADER));
+	shaders.push_back(createShader(fragmentShaderString.data(), GL_FRAGMENT_SHADER));
+
+	GLuint program = createShaderProgram(shaders);
+
+	for(GLuint const& shader: shaders)
+		glDeleteShader(shader);
+
+	glUseProgram(program);
+
+	// Getting shader locations
+	GLint positionAttribLocation = glGetAttribLocation(program, "inPosition");
+	GLint texcoordAttribLocation = glGetAttribLocation(program, "inTexcoord");
+//	int worldBlockIndex = glGetUniformBlockIndex(program, "World");
+
+	GLint lookAtUniformLocation = glGetUniformLocation(program, "lookAt");
+	GLint cameraFovUniformLocation = glGetUniformLocation(program, "_cameraFov");
+	GLint cameraAspectUniformLocation = glGetUniformLocation(program, "_cameraAspect");
+
+	// Settings up fullscreen triangle
+	float positions[6] = {-1.0f, -1.0f, 3.0f, -1.0f, -1.0f, 3.0f};
+	float texcoords[6] = {0.0f, 0.0f, 2.0f, 0.0f, 0.0f, 2.0f};
+
+	GLuint vao, vbo[2];
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+	glGenBuffers(2, vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[0]); // positions
+	glBufferData(GL_ARRAY_BUFFER, sizeof(positions), (const GLvoid*)positions, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(positionAttribLocation);
+	glVertexAttribPointer(positionAttribLocation, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vbo[1]); // texcoords
+	glBufferData(GL_ARRAY_BUFFER, sizeof(texcoords), (const GLvoid*)texcoords, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(texcoordAttribLocation);
+	glVertexAttribPointer(texcoordAttribLocation, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+	
+	glClearColor(0.0, 0.0, 0.0, 1.0);
+
+	bool running = true;
+	while (running) {
+		sf::Event event;
+		while (window.pollEvent(event)) {
+			if (event.type == sf::Event::Closed) {
+                running = false;
+			}
+			else if (event.type == sf::Event::Resized) {
+				glViewport(0, 0, event.size.width, event.size.height);
+			}
+		}
+		glClear(GL_COLOR_BUFFER_BIT);
+		
+		glUniform1f(cameraFovUniformLocation, (GLfloat)radians(75.0));
+		glUniform1f(cameraAspectUniformLocation, (GLfloat)videoMode.width / (GLfloat)videoMode.height);
+		glUniform3f(lookAtUniformLocation, 0.0, 0.0, 0.0);
+
+		glDrawArrays(GL_TRIANGLES, 0, 3);
+
+		window.display();
+	}
+}
 
 template <typename T>
 using vec3 = vec<T, 3>;
@@ -305,7 +465,7 @@ void preview_mode(const size_t width,
 }
 
 int main(int argc, char *argv[]) {
-    const size_t width = 800, height = 600;
+    const size_t width = 1280, height = 720;
 
     if (argc < 2) {
         std::cerr << "./ray-tracer <scene-file> [output-file]"
@@ -323,7 +483,8 @@ int main(int argc, char *argv[]) {
         const auto scene = load_scene_from_file(scene_file);
         file_render_mode(width, height, *output_file, scene);
     } else {
-        preview_mode(width, height, scene_file);
+		previewModeGL(sf::VideoMode(width, height), load_scene_from_file(scene_file));	
+//        preview_mode(width, height, scene_file);
     }
 
     return 0;
