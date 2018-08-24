@@ -119,6 +119,8 @@ void previewModeGL(sf::VideoMode videoMode, const Scene &scene) {
 	std::vector<char> fragmentShaderString = readFile(std::string("shader.frag"));
 	fragmentShaderString.push_back('\0');	
 	
+//	std::cout << fragmentShaderString.data() << std::endl;
+
 	shaders.push_back(createShader(vertexShaderString.data(), GL_VERTEX_SHADER));
 	shaders.push_back(createShader(fragmentShaderString.data(), GL_FRAGMENT_SHADER));
 
@@ -134,9 +136,11 @@ void previewModeGL(sf::VideoMode videoMode, const Scene &scene) {
 	GLint texcoordAttribLocation = glGetAttribLocation(program, "inTexcoord");
 //	int worldBlockIndex = glGetUniformBlockIndex(program, "World");
 
+	GLint framesUniformLocation = glGetUniformLocation(program, "frames");
+	GLint timeUniformLocation = glGetUniformLocation(program, "time");
+
 	GLint lookAtUniformLocation = glGetUniformLocation(program, "lookAt");
 	GLint cameraFovUniformLocation = glGetUniformLocation(program, "_cameraFov");
-	GLint cameraAspectUniformLocation = glGetUniformLocation(program, "_cameraAspect");
 
 	// Settings up fullscreen triangle
 	float positions[6] = {-1.0f, -1.0f, 3.0f, -1.0f, -1.0f, 3.0f};
@@ -155,8 +159,37 @@ void previewModeGL(sf::VideoMode videoMode, const Scene &scene) {
 	glBufferData(GL_ARRAY_BUFFER, sizeof(texcoords), (const GLvoid*)texcoords, GL_STATIC_DRAW);
 	glEnableVertexAttribArray(texcoordAttribLocation);
 	glVertexAttribPointer(texcoordAttribLocation, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
+
+	// Create screen fbo for Monte-Carlo simulation
+	GLuint fbo;
+	glGenFramebuffers(1, &fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 	
-	glClearColor(0.0, 0.0, 0.0, 1.0);
+	GLuint colorTexture;
+	glGenTextures(1, &colorTexture);
+	glBindTexture(GL_TEXTURE_2D, colorTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, videoMode.width, videoMode.height, 0, GL_RGBA, GL_FLOAT, nullptr);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);	
+	
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorTexture, 0);
+
+	GLuint depthTexture;
+	glGenTextures(1, &depthTexture);
+	glBindTexture(GL_TEXTURE_2D, depthTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, videoMode.width, videoMode.height, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, nullptr);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, depthTexture, 0);
+
+	if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		throw std::runtime_error("Framebuffer not complete!");
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	sf::Clock clock;
+	unsigned int frames = 0;
 
 	bool running = true;
 	while (running) {
@@ -169,16 +202,44 @@ void previewModeGL(sf::VideoMode videoMode, const Scene &scene) {
 				glViewport(0, 0, event.size.width, event.size.height);
 			}
 		}
-		glClear(GL_COLOR_BUFFER_BIT);
 		
-		glUniform1f(cameraFovUniformLocation, (GLfloat)radians(75.0));
-		glUniform1f(cameraAspectUniformLocation, (GLfloat)videoMode.width / (GLfloat)videoMode.height);
-		glUniform3f(lookAtUniformLocation, 0.0, 0.0, 0.0);
+		++frames;
 
+		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+		glViewport(0, 0, videoMode.width, videoMode.height);
+		glClearColor(0.0, 0.0, 0.0, 1.0);
+//		glEnable(GL_BLEND);
+//		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glDisable(GL_DEPTH_TEST);
+//		glClear(GL_COLOR_BUFFER_BIT);
+		
+		glBindTexture(GL_TEXTURE_2D, colorTexture);
+		glUseProgram(program);
+		glUniform1f(cameraFovUniformLocation, (GLfloat)radians(75.0));
+		glUniform2f(glGetUniformLocation(program, "resolution"), (GLfloat)videoMode.width, (GLfloat)videoMode.height);
+
+		glUniform1f(timeUniformLocation, clock.getElapsedTime().asSeconds());
+		glUniform1ui(framesUniformLocation, frames);
+
+		glUniform3f(lookAtUniformLocation, 0.0, 0.5, 1.0);
+
+		glBindVertexArray(vao);
 		glDrawArrays(GL_TRIANGLES, 0, 3);
 
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glViewport(0, 0, videoMode.width, videoMode.height);
+		glClearColor(0.0, 0.0, 0.0, 1.0);
+		glClear(GL_COLOR_BUFFER_BIT);
+		
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+		glBlitFramebuffer(0, 0, videoMode.width, videoMode.height, 0, 0, videoMode.width, videoMode.height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+		
 		window.display();
+
 	}
+
+	glDeleteFramebuffers(1, &fbo);
 }
 
 template <typename T>
@@ -465,7 +526,7 @@ void preview_mode(const size_t width,
 }
 
 int main(int argc, char *argv[]) {
-    const size_t width = 1280, height = 720;
+    const size_t width = 800, height = 600;
 
     if (argc < 2) {
         std::cerr << "./ray-tracer <scene-file> [output-file]"

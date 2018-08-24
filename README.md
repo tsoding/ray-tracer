@@ -2,6 +2,7 @@
 # Ray Tracer in pure (99.999%) C++
 
 ![](https://i.imgur.com/WyFWDAP.png)
+![](https://i.imgur.com/a/MkuvNiA.png)
 
 ## Quick Start
 
