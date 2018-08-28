@@ -6,11 +6,13 @@
 
 #include "sphere.hpp"
 #include "wall.hpp"
+#include "triangle.hpp"
 
 struct Scene {
     vec3<float> eye;
     std::vector<Sphere> spheres;
     std::vector<Wall> walls;
+    std::vector<Triangle> triangles;
 };
 
 std::ostream& operator<<(std::ostream& os, const Scene&scene);

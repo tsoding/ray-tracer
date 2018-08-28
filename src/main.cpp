@@ -64,6 +64,10 @@ void preview_mode(const size_t width,
 
     Scene scene = load_scene_from_file(scene_file);
 
+    for (const auto &triangle : scene.triangles) {
+        std::cout << plane_of_triangle(triangle) << std::endl;
+    }
+
     sf::RenderWindow window(sf::VideoMode(static_cast<unsigned int>(width),
                                           static_cast<unsigned int>(height),
                                           32),

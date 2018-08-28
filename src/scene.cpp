@@ -47,6 +47,10 @@ const Scene load_scene_from_file(const std::string &filename) {
                     {plane1, plane2, plane3, plane4},
                     hex_color != nullptr ? *hex_color : color{1.0f, 1.0f, 1.0f}
                 });
+        } else if (type == "t") {  // triangle
+            Triangle t;
+            iss >> t.v1 >> t.v2 >> t.v3;
+            scene.triangles.push_back(t);
         }
     }
 
@@ -65,6 +69,8 @@ color march(float x, float y,
     vec3<float> ray = {x, y, 0.0f};
     size_t step_count = 600;
 
+    color triangle_color = {1.0f, 0.0f, 0.0f};
+
     for (size_t i = 0; i < step_count; ++i) {
         ray += dir;
 
@@ -78,6 +84,12 @@ color march(float x, float y,
         for (const auto &wall : scene.walls) {
             if (is_ray_behind_wall(wall, ray)) {
                 return wall.c * color_factor(i, step_count);
+            }
+        }
+
+        for (const auto &triangle : scene.triangles) {
+            if (ray_hits_triangle(triangle, ray)) {
+                return triangle_color * color_factor(i, step_count);
             }
         }
     }

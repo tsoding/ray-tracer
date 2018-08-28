@@ -12,6 +12,8 @@ struct vec {
 template <typename T>
 using vec3 = vec<T, 3>;
 
+using v3f = vec3<float>;
+
 template <typename T, size_t N>
 inline std::ostream& operator<<(std::ostream& os, const vec<T, N> &vec) {
     os << "{";
