@@ -4,7 +4,7 @@
 #include "vec.hpp"
 #include "wall.hpp"
 
-// TODO: support for triangle meshes from obj files
+// TODO(#65): support for triangle meshes from obj files
 
 struct Triangle {
     v3f v1, v2, v3;
