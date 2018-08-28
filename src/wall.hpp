@@ -2,8 +2,8 @@
 #define WALL_H_
 
 #include "./color.hpp"
-#include "./plane.hpp"
 
+using plane = vec<float, 4>;
 
 struct Wall {
     plane p;
