@@ -61,7 +61,7 @@ bool ray_hits_triangle(const Triangle &triangle,
     const float h3 = point_segment_distance(triangle.v3, triangle.v1, triangle.v2);
     const float d3 = sqrtf(sqr_norm(ray - triangle.v3));
 
-    return dot(triangle_plane, ray) <= 0.0f && d1 <= h1 && d2 <= h2 && d3 <= h3;
+    return dot(vec_push(ray, 1.0f), triangle_plane) <= 0.0f && d1 <= h1 && d2 <= h2 && d3 <= h3;
 }
 
 // The point is in the triangle if EACH of the DISTANCES is less than

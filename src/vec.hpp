@@ -91,12 +91,44 @@ inline T sqr_norm(const vec<T, N> &v) {
     return acc;
 }
 
-inline float dot(const vec3<float> &v1, const vec3<float> &v2) {
-    return v1.v[0] * v2.v[0] + v1.v[1] * v2.v[1] + v1.v[2] * v2.v[2];
+template <typename T, size_t N>
+inline T dot(const vec<T, N> &v1, const vec<T, N> &v2) {
+    T result = T();
+
+    for (size_t i = 0; i < N; ++i) {
+        result += v1.v[i] * v2.v[i];
+    }
+
+    return result;
 }
 
 inline vec3<float> normalize(const vec3<float> &v) {
     return 1.0f / sqrtf(sqr_norm(v)) * v;
+}
+
+template <typename T, size_t N>
+inline vec<T, N + 1> vec_push(const vec<T, N> &v1, const T &t) {
+    vec<T, N + 1> v2;
+
+    for (size_t i = 0; i < N; ++i) {
+        v2.v[i] = v1.v[i];
+    }
+
+    v2.v[N] = t;
+
+    return v2;
+}
+
+template <typename T, size_t N>
+inline typename std::enable_if<(N > 0), vec<T, N - 1>>::type
+vec_pop(const vec<T, N> &v1) {
+    vec<T, N - 1> v2;
+
+    for (size_t i = 0; i < N - 1; ++i) {
+        v2.v[i] = v1.v[i];
+    }
+
+    return v2;
 }
 
 #endif  // SRC_VEC_HPP_
