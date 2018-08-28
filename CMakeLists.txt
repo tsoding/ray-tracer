@@ -11,12 +11,15 @@ set(RAY_TRACER_SOURCES
   src/color.cpp
   src/color.hpp
   src/main.cpp
+  src/plane.hpp
   src/ppm.cpp
   src/ppm.hpp
   src/scene.cpp
   src/scene.hpp
   src/sphere.cpp
   src/sphere.hpp
+  src/triangle.cpp
+  src/triangle.hpp
   src/vec.hpp
   src/wall.cpp
   src/wall.hpp
