@@ -40,12 +40,12 @@ plane plane_of_triangle(const Triangle &triangle) {
     return plane {xp.v[0], xp.v[1], xp.v[2], d};
 }
 
-float point_segment_distance(const v3f &p, const v3f &s1, const v3f &s2) {
-    const v3f dir = normalize(s2 - s1);
-    const v3f v = s1 - p;
-    const float t = dir.v[0] * v.v[0] + dir.v[1] * v.v[1] + dir.v[2] * v.v[2];
-    const v3f p1 = s1 + t * dir;
-    return sqrtf(sqr_norm(p1 - p));
+float point_segment_distance(const v3f &p, const v3f &a, const v3f &b) {
+    const v3f n = b - a;
+    const v3f pa = a - p;
+    const v3f c = n * (dot(pa, n) / dot(n, n));
+    const v3f d = pa - c;
+    return sqrtf(dot(d, d));
 }
 
 bool ray_hits_triangle(const Triangle &triangle,
@@ -61,7 +61,7 @@ bool ray_hits_triangle(const Triangle &triangle,
     const float h3 = point_segment_distance(triangle.v3, triangle.v1, triangle.v2);
     const float d3 = sqrtf(sqr_norm(ray - triangle.v3));
 
-    return dot(triangle_plane, ray) < 0.0f && d1 <= h1 && d2 <= h2 && d3 <= h3;
+    return dot(triangle_plane, ray) <= 0.0f && d1 <= h1 && d2 <= h2 && d3 <= h3;
 }
 
 // The point is in the triangle if EACH of the DISTANCES is less than
