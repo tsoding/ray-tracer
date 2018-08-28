@@ -5,5 +5,5 @@ std::ostream& operator<<(std::ostream& os, const Wall&wall) {
 }
 
 bool is_ray_behind_wall(const Wall &wall, const vec3<float> &ray) {
-    return dot(wall.p, ray) < 0.0f;
+    return dot(wall.p, vec_push(ray, 1.0f)) < 0.0f;
 }
