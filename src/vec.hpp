@@ -119,16 +119,4 @@ inline vec<T, N + 1> vec_push(const vec<T, N> &v1, const T &t) {
     return v2;
 }
 
-template <typename T, size_t N>
-inline typename std::enable_if<(N > 0), vec<T, N - 1>>::type
-vec_pop(const vec<T, N> &v1) {
-    vec<T, N - 1> v2;
-
-    for (size_t i = 0; i < N - 1; ++i) {
-        v2.v[i] = v1.v[i];
-    }
-
-    return v2;
-}
-
 #endif  // SRC_VEC_HPP_
