@@ -50,18 +50,16 @@ float point_segment_distance(const v3f &p, const v3f &a, const v3f &b) {
 
 bool ray_hits_triangle(const Triangle &triangle,
                        const v3f &ray) {
-    const plane triangle_plane = plane_of_triangle(triangle);
+    const auto p = plane_of_triangle(triangle);
+    const auto n = normalize(vec_pop(p));
 
-    const float h1 = point_segment_distance(triangle.v1, triangle.v2, triangle.v3);
-    const float d1 = sqrtf(sqr_norm(ray - triangle.v1));
+    const auto AB = triangle.v2 - triangle.v1;
+    const auto BC = triangle.v3 - triangle.v2;
+    const auto CA = triangle.v1 - triangle.v3;
 
-    const float h2 = point_segment_distance(triangle.v2, triangle.v3, triangle.v1);
-    const float d2 = sqrtf(sqr_norm(ray - triangle.v2));
-
-    const float h3 = point_segment_distance(triangle.v3, triangle.v1, triangle.v2);
-    const float d3 = sqrtf(sqr_norm(ray - triangle.v3));
-
-    return dot(vec_push(ray, 1.0f), triangle_plane) <= 0.0f && d1 <= h1 && d2 <= h2 && d3 <= h3;
+    return dot(n, cross_product(AB, ray - triangle.v1)) > 0
+        && dot(n, cross_product(BC, ray - triangle.v2)) > 0
+        && dot(n, cross_product(CA, ray - triangle.v3)) > 0;
 }
 
 // The point is in the triangle if EACH of the DISTANCES is less than
