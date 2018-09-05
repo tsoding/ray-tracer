@@ -3,6 +3,7 @@
 
 #include <ostream>
 #include <cmath>
+#include <algorithm>
 
 template <typename T, size_t N>
 struct vec {
@@ -106,6 +107,11 @@ inline vec3<float> normalize(const vec3<float> &v) {
     return 1.0f / sqrtf(sqr_norm(v)) * v;
 }
 
+template <size_t N>
+inline float len(const vec<float, N> &v) {
+    return sqrtf(sqr_norm(v));
+}
+
 template <typename T, size_t N>
 inline vec<T, N + 1> vec_push(const vec<T, N> &v1, const T &t) {
     vec<T, N + 1> v2;
@@ -119,4 +125,10 @@ inline vec<T, N + 1> vec_push(const vec<T, N> &v1, const T &t) {
     return v2;
 }
 
+template <typename T, size_t N>
+inline vec<T, N - 1> vec_pop(const vec<T, N> &v) {
+    vec<T, N - 1> result;
+    std::copy(v.v, v.v + N - 1, result.v);
+    return result;
+}
 #endif  // SRC_VEC_HPP_
