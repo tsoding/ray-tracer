@@ -17,16 +17,16 @@
 #include <SFML/Graphics.hpp>    // NOLINT
 
 #include "./color.hpp"
-#include "./ppm.hpp"
 #include "./scene.hpp"
 #include "./sphere.hpp"
 #include "./vec.hpp"
+#include "./display.hpp"
 
 void file_render_mode(const size_t width,
                       const size_t height,
                       const std::string &output_file,
                       const Scene &scene) {
-    std::unique_ptr<color[]> display(new color[width * height]);
+    Display display(width, height);
 
     const float half_width = static_cast<float>(width) * 0.5f;
     const float half_height = static_cast<float>(height) * 0.5f;
@@ -43,16 +43,16 @@ void file_render_mode(const size_t width,
                                     static_cast<float>(row) - half_height,
                                     0.0f };
 
-            display[row * width + col] =
-                march(static_cast<float>(col) - half_width,
-                      static_cast<float>(row) - half_height,
-                      scene,
-                      normalize(p - scene.eye));
+            display.put(row, col,
+                        march(static_cast<float>(col) - half_width,
+                              static_cast<float>(row) - half_height,
+                              scene,
+                              normalize(p - scene.eye)));
         }
     }
     std::cout << "\rRendering... 100.0%" << std::endl;
 
-    save_ppm_file(display.get(), width, height, output_file);
+    display.save_as_ppm(output_file);
 }
 
 void preview_mode(const size_t width,

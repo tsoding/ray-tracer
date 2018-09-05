@@ -10,9 +10,9 @@ include_directories(${SFML_INCLUDE_DIR})
 set(RAY_TRACER_SOURCES
   src/color.cpp
   src/color.hpp
+  src/display.cpp
+  src/display.hpp
   src/main.cpp
-  src/ppm.cpp
-  src/ppm.hpp
   src/scene.cpp
   src/scene.hpp
   src/sphere.cpp
