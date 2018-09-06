@@ -18,8 +18,10 @@
 
 #include "./color.hpp"
 #include "./display.hpp"
+#include "./progress.hpp"
 #include "./rendering_scene.hpp"
 #include "./scene.hpp"
+#include "./seq_rendering_scene.hpp"
 #include "./sphere.hpp"
 #include "./vec.hpp"
 
@@ -28,18 +30,10 @@ void file_render_mode(const size_t width,
                       const std::string &output_file,
                       const Scene &scene) {
     Display display(width, height);
-    RenderingScene renderingScene(&scene, &display);
 
-    for (size_t row = 0; row < height; ++row) {
-        std::cout << "\rRendering... "
-            << std::fixed << std::setprecision(1)
-            << static_cast<float>(100 * row) / static_cast<float>(height)
-            << std::left << std::setfill(' ') << std::setw(2)
-            << "%" << std::flush;
-
-        renderingScene.renderRow(row);
-    }
-    std::cout << "\rRendering... 100.0%" << std::endl;
+    Progress<SeqRenderingScene>(
+        SeqRenderingScene(RenderingScene(&scene, &display)),
+        "Rendering").start();
 
     display.save_as_ppm(output_file);
 }

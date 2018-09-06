@@ -12,6 +12,9 @@ class RenderingScene {
                    Display *display);
 
     void renderRow(size_t row);
+    inline size_t height() {
+        return m_display->height();
+    }
 
  private:
     const Scene * const m_scene;
