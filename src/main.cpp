@@ -17,19 +17,18 @@
 #include <SFML/Graphics.hpp>    // NOLINT
 
 #include "./color.hpp"
+#include "./display.hpp"
+#include "./rendering_scene.hpp"
 #include "./scene.hpp"
 #include "./sphere.hpp"
 #include "./vec.hpp"
-#include "./display.hpp"
 
 void file_render_mode(const size_t width,
                       const size_t height,
                       const std::string &output_file,
                       const Scene &scene) {
     Display display(width, height);
-
-    const float half_width = static_cast<float>(width) * 0.5f;
-    const float half_height = static_cast<float>(height) * 0.5f;
+    RenderingScene renderingScene(&scene, &display);
 
     for (size_t row = 0; row < height; ++row) {
         std::cout << "\rRendering... "
@@ -38,17 +37,7 @@ void file_render_mode(const size_t width,
             << std::left << std::setfill(' ') << std::setw(2)
             << "%" << std::flush;
 
-        for (size_t col = 0; col < width; ++col) {
-            const vec3<float> p = { static_cast<float>(col) - half_width,
-                                    static_cast<float>(row) - half_height,
-                                    0.0f };
-
-            display.put(row, col,
-                        march(static_cast<float>(col) - half_width,
-                              static_cast<float>(row) - half_height,
-                              scene,
-                              normalize(p - scene.eye)));
-        }
+        renderingScene.renderRow(row);
     }
     std::cout << "\rRendering... 100.0%" << std::endl;
 
