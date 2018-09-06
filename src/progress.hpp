@@ -10,9 +10,10 @@ class Progress
 {
  public:
     using PartialWork = T;
-    using PartialWorkUnit = decltype(PartialWork::progressGoal());
 
     // TODO: static_assert message is confusing
+    static_assert(std::is_member_function_pointer<decltype(&PartialWork::progressDo)>::value,
+                  "PartialWork is expected to have progressDo() method");
     static_assert(std::is_member_function_pointer<decltype(&PartialWork::progressWork)>::value,
                   "PartialWork is expected to have progressWork() method");
     static_assert(std::is_member_function_pointer<decltype(&PartialWork::progressGoal)>::value,
@@ -24,25 +25,34 @@ class Progress
         m_name(name) {
     }
 
-    PartialWorkUnit progressGoal() {
+    void progressDo() {
+        m_partialWork.progressDo();
+    }
+
+    size_t progressGoal() {
         return m_partialWork.progressGoal();
     }
 
-    PartialWorkUnit progressWork() {
+    size_t progressWork() {
         return m_partialWork.progressWork();
     }
 
+    void report() {
+        const auto work = m_partialWork.progressWork();
+        const auto goal = m_partialWork.progressGoal();
+        const float progress =
+            static_cast<float>(work) / static_cast<float>(goal) * 100.0f;
+        std::cout << "\r" << m_name << "... "
+                  << std::fixed << std::setprecision(1)
+                  << progress
+                  << std::left << std::setfill(' ') << std::setw(2)
+                  << "%" << std::flush;
+    }
+
     void start() {
-        PartialWorkUnit work = 0;
-        while (work < m_partialWork.progressGoal()) {
-            work = m_partialWork.progressWork();
-            const float progress =
-                static_cast<float>(100 * work) / static_cast<float>(m_partialWork.progressGoal());
-            std::cout << "\r" << m_name << "... "
-                      << std::fixed << std::setprecision(1)
-                      << progress
-                      << std::left << std::setfill(' ') << std::setw(2)
-                      << "%" << std::flush;
+        while (m_partialWork.progressWork() < m_partialWork.progressGoal()) {
+            m_partialWork.progressDo();
+            report();
         }
     }
 

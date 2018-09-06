@@ -7,6 +7,7 @@ class SeqRenderingScene {
  public:
     explicit SeqRenderingScene(RenderingScene &&renderingScene);
 
+    void progressDo();
     size_t progressWork();
     size_t progressGoal();
 

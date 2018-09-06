@@ -6,13 +6,13 @@ SeqRenderingScene::SeqRenderingScene(RenderingScene &&renderingScene):
     m_renderingScene(std::move(renderingScene)) {
 }
 
-size_t SeqRenderingScene::progressWork() {
-    if (m_row >= m_renderingScene.height()) {
-        return m_renderingScene.height();
+void SeqRenderingScene::progressDo() {
+    if (progressWork() < progressGoal()) {
+        m_renderingScene.renderRow(m_row++);
     }
+}
 
-    m_renderingScene.renderRow(m_row++);
-
+size_t SeqRenderingScene::progressWork() {
     return m_row;
 }
 
