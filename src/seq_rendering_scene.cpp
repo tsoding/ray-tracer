@@ -12,10 +12,10 @@ void SeqRenderingScene::progressDo() {
     }
 }
 
-size_t SeqRenderingScene::progressWork() {
+size_t SeqRenderingScene::progressWork() const {
     return m_row;
 }
 
-size_t SeqRenderingScene::progressGoal() {
+size_t SeqRenderingScene::progressGoal() const {
     return m_renderingScene.height();
 }

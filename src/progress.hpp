@@ -29,15 +29,15 @@ class Progress
         m_partialWork.progressDo();
     }
 
-    size_t progressGoal() {
+    size_t progressGoal() const {
         return m_partialWork.progressGoal();
     }
 
-    size_t progressWork() {
+    size_t progressWork() const {
         return m_partialWork.progressWork();
     }
 
-    void report() {
+    void report() const {
         const auto work = m_partialWork.progressWork();
         const auto goal = m_partialWork.progressGoal();
         const float progress =

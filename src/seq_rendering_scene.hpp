@@ -8,8 +8,8 @@ class SeqRenderingScene {
     explicit SeqRenderingScene(RenderingScene &&renderingScene);
 
     void progressDo();
-    size_t progressWork();
-    size_t progressGoal();
+    size_t progressWork() const;
+    size_t progressGoal() const;
 
  private:
     RenderingScene m_renderingScene;
