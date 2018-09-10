@@ -93,6 +93,7 @@ void preview_mode(const size_t width,
                 case sf::Keyboard::R:
                     scene = load_scene_from_file(scene_file);
                     display.clean();
+                    progress.progressReset();
                     break;
                 default: break;
                 }
