@@ -24,7 +24,7 @@
 #include "./rand_rendering_scene.hpp"
 #include "./seq_rendering_scene.hpp"
 #include "./sphere.hpp"
-#include "./texture_display.hpp"
+#include "./sprite_display.hpp"
 #include "./vec.hpp"
 
 void file_render_mode(const size_t width,
@@ -51,14 +51,14 @@ void preview_mode(const size_t width,
     std::iota(ns.begin(), ns.end(), 0);
 
     Scene scene = load_scene_from_file(scene_file);
-    TextureDisplay textureDisplay(width, height);
+    SpriteDisplay display(width, height);
 
     auto progress =
         mkProgress(
             mkRandRenderingScene(
                 mkRenderingScene(
                     &scene,
-                    &textureDisplay)),
+                    &display)),
             "Preview rendering",
             10);
 
@@ -70,10 +70,6 @@ void preview_mode(const size_t width,
     window.setVerticalSyncEnabled(true);
     window.clear(sf::Color(0, 0, 0));
     window.display();
-
-    // TODO(#72): replace direct usage of sf::Sprite with SpriteDisplay that wrap TextureDisplay
-    sf::Sprite sprite(textureDisplay.texture(),
-                      sf::IntRect(0, 0, static_cast<int>(width), static_cast<int>(height)));
 
     while (window.isOpen()) {
         sf::Event event;
@@ -96,7 +92,7 @@ void preview_mode(const size_t width,
                     break;
                 case sf::Keyboard::R:
                     scene = load_scene_from_file(scene_file);
-                    textureDisplay.clean();
+                    display.clean();
                     break;
                 default: break;
                 }
@@ -109,10 +105,8 @@ void preview_mode(const size_t width,
         progress.report();
         progress.progressDo();
 
-        sprite.setTexture(textureDisplay.texture());
-
         window.clear();
-        window.draw(sprite);
+        window.draw(display.sprite());
         window.display();
     }
 }
