@@ -11,22 +11,18 @@ class Progress
  public:
     using PartialWork = T;
 
-    // TODO: static_assert message is confusing
-    static_assert(std::is_member_function_pointer<decltype(&PartialWork::progressDo)>::value,
-                  "PartialWork is expected to have progressDo() method");
-    static_assert(std::is_member_function_pointer<decltype(&PartialWork::progressWork)>::value,
-                  "PartialWork is expected to have progressWork() method");
-    static_assert(std::is_member_function_pointer<decltype(&PartialWork::progressGoal)>::value,
-                  "PartialWork is expected to have progressGoal() method");
-
     Progress(PartialWork &&partialWork,
-             const std::string &name):
+             const std::string &name,
+             size_t batch = 1):
         m_partialWork(std::move(partialWork)),
-        m_name(name) {
+        m_name(name),
+        m_batch(batch) {
     }
 
     void progressDo() {
-        m_partialWork.progressDo();
+        for (size_t i = 0; i < m_batch; ++i) {
+            m_partialWork.progressDo();
+        }
     }
 
     void progressReset() {
@@ -63,13 +59,15 @@ class Progress
  private:
     PartialWork m_partialWork;
     const std::string m_name;
+    const size_t m_batch;
 };
 
 template <typename PartialWork>
 inline Progress<PartialWork>
 mkProgress(PartialWork &&partialWork,
-           const std::string &name) {
-    return Progress<PartialWork>(std::move(partialWork), name);
+           const std::string &name,
+           size_t batch = 1) {
+    return Progress<PartialWork>(std::move(partialWork), name, batch);
 }
 
 #endif  // PROGRESS_HPP_

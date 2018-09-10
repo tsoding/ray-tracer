@@ -59,7 +59,8 @@ void preview_mode(const size_t width,
                 mkRenderingScene(
                     &scene,
                     &textureDisplay)),
-            "Preview rendering");
+            "Preview rendering",
+            10);
 
     sf::RenderWindow window(sf::VideoMode(static_cast<unsigned int>(width),
                                           static_cast<unsigned int>(height),
@@ -72,8 +73,6 @@ void preview_mode(const size_t width,
 
     sf::Sprite sprite(textureDisplay.texture(),
                       sf::IntRect(0, 0, static_cast<int>(width), static_cast<int>(height)));
-
-    size_t k = 0;
 
     while (window.isOpen()) {
         sf::Event event;
@@ -109,15 +108,11 @@ void preview_mode(const size_t width,
         progress.report();
         progress.progressDo();
 
-        if (k == 0) {
-            sprite.setTexture(textureDisplay.texture());
+        sprite.setTexture(textureDisplay.texture());
 
-            window.clear();
-            window.draw(sprite);
-            window.display();
-        }
-
-        k = (k + 1) % 10;
+        window.clear();
+        window.draw(sprite);
+        window.display();
     }
 }
 
