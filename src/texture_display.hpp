@@ -15,8 +15,9 @@ class TextureDisplay {
     size_t height() const;
 
     void put(size_t row, size_t col, const color &c);
+    void clean();
 
-    sf::Texture as_texture();
+    const sf::Texture &texture();
 
  private:
     const size_t m_width;

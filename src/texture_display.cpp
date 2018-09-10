@@ -23,7 +23,11 @@ void TextureDisplay::put(size_t row, size_t col, const color &c) {
     m_buffer[row * m_width * 4 + col * 4 + 3] = 255;
 }
 
-sf::Texture TextureDisplay::as_texture() {
+const sf::Texture &TextureDisplay::texture() {
     m_texture.update(m_buffer.data());
     return m_texture;
+}
+
+void TextureDisplay::clean() {
+    std::fill(m_buffer.begin(), m_buffer.end(), 0);
 }

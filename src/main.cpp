@@ -23,6 +23,7 @@
 #include "./scene.hpp"
 #include "./seq_rendering_scene.hpp"
 #include "./sphere.hpp"
+#include "./texture_display.hpp"
 #include "./vec.hpp"
 
 void file_render_mode(const size_t width,
@@ -49,10 +50,8 @@ void preview_mode(const size_t width,
     std::iota(ns.begin(), ns.end(), 0);
 
     Scene scene = load_scene_from_file(scene_file);
+    TextureDisplay textureDisplay(width, height);
 
-    for (const auto &triangle : scene.triangles) {
-        std::cout << plane_of_triangle(triangle) << std::endl;
-    }
 
     sf::RenderWindow window(sf::VideoMode(static_cast<unsigned int>(width),
                                           static_cast<unsigned int>(height),
@@ -63,14 +62,8 @@ void preview_mode(const size_t width,
     window.clear(sf::Color(0, 0, 0));
     window.display();
 
-    const size_t textureSize = width * height * 4;
-
-    std::vector<sf::Uint8> buffer(textureSize, 0);
-
-    sf::Texture texture;
-    texture.create(static_cast<unsigned int>(width), static_cast<unsigned int>(height));
-
-    sf::Sprite sprite(texture, sf::IntRect(0, 0, static_cast<int>(width), static_cast<int>(height)));
+    sf::Sprite sprite(textureDisplay.texture(),
+                      sf::IntRect(0, 0, static_cast<int>(width), static_cast<int>(height)));
 
     const float half_width = static_cast<float>(width) * 0.5f;
     const float half_height = static_cast<float>(height) * 0.5f;
@@ -98,7 +91,7 @@ void preview_mode(const size_t width,
                     break;
                 case sf::Keyboard::R:
                     scene = load_scene_from_file(scene_file);
-                    std::fill(buffer.begin(), buffer.end(), 0);
+                    textureDisplay.clean();
                     i = 0;
                     break;
                 default: break;
@@ -132,11 +125,7 @@ void preview_mode(const size_t width,
                           static_cast<float>(row) - half_height,
                           scene,
                           normalize(ray - scene.eye));
-
-                buffer[row * width * 4 + col * 4 + 0] = static_cast<sf::Uint8>(pixel_color.v[0] * 255.0f);
-                buffer[row * width * 4 + col * 4 + 1] = static_cast<sf::Uint8>(pixel_color.v[1] * 255.0f);
-                buffer[row * width * 4 + col * 4 + 2] = static_cast<sf::Uint8>(pixel_color.v[2] * 255.0f);
-                buffer[row * width * 4 + col * 4 + 3] = 255;
+                textureDisplay.put(row, col, pixel_color);
             }
         } else if (i == ns.size()) {
             ++i;
@@ -144,8 +133,7 @@ void preview_mode(const size_t width,
         }
 
         if (k == 0) {
-            texture.update(buffer.data());
-            sprite.setTexture(texture);
+            sprite.setTexture(textureDisplay.texture());
 
             window.clear();
             window.draw(sprite);
