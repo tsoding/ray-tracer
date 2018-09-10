@@ -29,6 +29,10 @@ class Progress
         m_partialWork.progressDo();
     }
 
+    void progressReset() {
+        m_partialWork.progressReset();
+    }
+
     size_t progressGoal() const {
         return m_partialWork.progressGoal();
     }
@@ -60,5 +64,12 @@ class Progress
     PartialWork m_partialWork;
     const std::string m_name;
 };
+
+template <typename PartialWork>
+inline Progress<PartialWork>
+mkProgress(PartialWork &&partialWork,
+           const std::string &name) {
+    return Progress<PartialWork>(std::move(partialWork), name);
+}
 
 #endif  // PROGRESS_HPP_

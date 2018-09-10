@@ -21,6 +21,7 @@
 #include "./progress.hpp"
 #include "./rendering_scene.hpp"
 #include "./scene.hpp"
+#include "./rand_rendering_scene.hpp"
 #include "./seq_rendering_scene.hpp"
 #include "./sphere.hpp"
 #include "./texture_display.hpp"
@@ -32,9 +33,9 @@ void file_render_mode(const size_t width,
                       const Scene &scene) {
     Display display(width, height);
 
-    Progress<SeqRenderingScene>(
-        SeqRenderingScene(
-            RenderingScene(
+    mkProgress(
+        mkSeqRenderingScene(
+            mkRenderingScene(
                 &scene,
                 &display)),
         "Rendering").start();
@@ -52,6 +53,13 @@ void preview_mode(const size_t width,
     Scene scene = load_scene_from_file(scene_file);
     TextureDisplay textureDisplay(width, height);
 
+    auto progress =
+        mkProgress(
+            mkRandRenderingScene(
+                mkRenderingScene(
+                    &scene,
+                    &textureDisplay)),
+            "Preview rendering");
 
     sf::RenderWindow window(sf::VideoMode(static_cast<unsigned int>(width),
                                           static_cast<unsigned int>(height),
@@ -65,10 +73,7 @@ void preview_mode(const size_t width,
     sf::Sprite sprite(textureDisplay.texture(),
                       sf::IntRect(0, 0, static_cast<int>(width), static_cast<int>(height)));
 
-    const float half_width = static_cast<float>(width) * 0.5f;
-    const float half_height = static_cast<float>(height) * 0.5f;
-
-    size_t k = 0, i = 0;
+    size_t k = 0;
 
     while (window.isOpen()) {
         sf::Event event;
@@ -92,7 +97,6 @@ void preview_mode(const size_t width,
                 case sf::Keyboard::R:
                     scene = load_scene_from_file(scene_file);
                     textureDisplay.clean();
-                    i = 0;
                     break;
                 default: break;
                 }
@@ -102,35 +106,8 @@ void preview_mode(const size_t width,
             }
         }
 
-        if (i < ns.size()) {
-            if (i == 0) {
-                std::shuffle(ns.begin(), ns.end(), gen);
-                std::cout << "\rRendering..." << std::flush;
-            }
-
-            std::cout << "\rRendering... "
-                << std::fixed << std::setprecision(1)
-                << static_cast<float>(100*i)/static_cast<float>(height)
-                << std::left << std::setfill(' ') << std::setw(2)
-                << "%" << std::flush;
-
-            const size_t row = ns[i++];
-
-            for (size_t col = 0; col < width; ++col) {
-                const vec3<float> ray = { static_cast<float>(col) - half_width,
-                                          static_cast<float>(row) - half_height,
-                                          0.0f };
-                const color pixel_color =
-                    march(static_cast<float>(col) - half_width,
-                          static_cast<float>(row) - half_height,
-                          scene,
-                          normalize(ray - scene.eye));
-                textureDisplay.put(row, col, pixel_color);
-            }
-        } else if (i == ns.size()) {
-            ++i;
-            std::cout << "\rRendering... 100.0%" << std::endl;
-        }
+        progress.report();
+        progress.progressDo();
 
         if (k == 0) {
             sprite.setTexture(textureDisplay.texture());
