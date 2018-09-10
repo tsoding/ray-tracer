@@ -20,6 +20,8 @@ set(RAY_TRACER_SOURCES
   src/seq_rendering_scene.hpp
   src/sphere.cpp
   src/sphere.hpp
+  src/sprite_display.cpp
+  src/sprite_display.hpp
   src/texture_display.cpp
   src/texture_display.hpp
   src/triangle.cpp
