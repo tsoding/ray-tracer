@@ -32,7 +32,10 @@ void file_render_mode(const size_t width,
     Display display(width, height);
 
     Progress<SeqRenderingScene>(
-        SeqRenderingScene(RenderingScene(&scene, &display)),
+        SeqRenderingScene(
+            RenderingScene(
+                &scene,
+                &display)),
         "Rendering").start();
 
     display.save_as_ppm(output_file);
