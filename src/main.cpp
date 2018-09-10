@@ -71,6 +71,7 @@ void preview_mode(const size_t width,
     window.clear(sf::Color(0, 0, 0));
     window.display();
 
+    // TODO: replace direct usage of sf::Sprite with SpriteDisplay that wrap TextureDisplay
     sf::Sprite sprite(textureDisplay.texture(),
                       sf::IntRect(0, 0, static_cast<int>(width), static_cast<int>(height)));
 
