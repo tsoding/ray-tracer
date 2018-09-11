@@ -22,6 +22,7 @@
 #include "./progress.hpp"
 #include "./rand_rendering.hpp"
 #include "./row_marching.hpp"
+#include "./row_tracing.hpp"
 #include "./scene.hpp"
 #include "./sphere.hpp"
 #include "./sprite_display.hpp"

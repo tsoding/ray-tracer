@@ -18,5 +18,6 @@ struct Scene {
 std::ostream& operator<<(std::ostream& os, const Scene&scene);
 const Scene load_scene_from_file(const std::string &filename);
 color march(float x, float y, const Scene &scene, vec3<float> dir);
+color trace(float x, float y, const Scene &scene, vec3<float> dir);
 
 #endif  // SCENE_HPP_

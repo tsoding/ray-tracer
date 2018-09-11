@@ -18,6 +18,7 @@ set(RAY_TRACER_SOURCES
   src/progress.hpp
   src/rand_rendering.hpp
   src/row_marching.hpp
+  src/row_tracing.hpp
   src/scene.cpp
   src/scene.hpp
   src/sphere.cpp
