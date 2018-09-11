@@ -55,7 +55,7 @@ void preview_mode(const size_t width,
     Scene scene = load_scene_from_file(scene_file);
     SpriteDisplay display(width, height);
 
-    // TODO: preview mode does not support parallelization
+    // TODO(#75): preview mode does not support parallelization
     auto progress =
         mkProgress(
             mkRandRenderingScene(
