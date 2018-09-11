@@ -4,6 +4,7 @@ project(ray-tracer)
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 
 find_package(SFML REQUIRED system window graphics)
+find_package(Threads REQUIRED)
 
 include_directories(${SFML_INCLUDE_DIR})
 
@@ -45,7 +46,7 @@ target_compile_options(ray-tracer PRIVATE
   -pedantic
   )
 
-target_link_libraries(ray-tracer ${SFML_LIBRARIES})
+target_link_libraries(ray-tracer ${SFML_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
 include(CppLint)
 add_cpp_lint_target(lint "${RAY_TRACER_SOURCES}")

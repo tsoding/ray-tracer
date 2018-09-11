@@ -18,10 +18,11 @@
 
 #include "./color.hpp"
 #include "./display.hpp"
+#include "./parallel_rendering_scene.hpp"
 #include "./progress.hpp"
+#include "./rand_rendering_scene.hpp"
 #include "./rendering_scene.hpp"
 #include "./scene.hpp"
-#include "./rand_rendering_scene.hpp"
 #include "./seq_rendering_scene.hpp"
 #include "./sphere.hpp"
 #include "./sprite_display.hpp"
@@ -34,10 +35,11 @@ void file_render_mode(const size_t width,
     Display display(width, height);
 
     mkProgress(
-        mkSeqRenderingScene(
+        mkParallelRenderingScene(
             mkRenderingScene(
                 &scene,
-                &display)),
+                &display),
+            3),
         "Rendering").start();
 
     display.save_as_ppm(output_file);
@@ -53,6 +55,7 @@ void preview_mode(const size_t width,
     Scene scene = load_scene_from_file(scene_file);
     SpriteDisplay display(width, height);
 
+    // TODO(#75): preview mode does not support parallelization
     auto progress =
         mkProgress(
             mkRandRenderingScene(
