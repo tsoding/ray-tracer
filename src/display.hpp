@@ -9,6 +9,9 @@
 class Display {
  public:
     Display(size_t width, size_t height);
+    Display(const Display &display);
+    Display(Display &&display);
+    ~Display();
 
     size_t width() const;
     size_t height() const;
@@ -21,7 +24,7 @@ class Display {
  private:
     const size_t m_width;
     const size_t m_height;
-    std::unique_ptr<color[]> m_data;
+    color *m_data;
 };
 
 #endif  // DISPLAY_HPP_

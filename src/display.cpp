@@ -1,11 +1,32 @@
+#include <algorithm>
 #include <fstream>
 #include <string>
+
 #include "display.hpp"
 
 Display::Display(size_t width, size_t height):
     m_width(width),
     m_height(height),
     m_data(new color[width * height]) {
+}
+
+Display::Display(const Display &display):
+    m_width(display.m_width),
+    m_height(display.m_height),
+    m_data(new color[m_width * m_height]) {
+    std::copy(display.m_data,
+              display.m_data + m_width * m_height,
+              m_data);
+}
+
+Display::Display(Display &&display):
+    m_width(display.m_width),
+    m_height(display.m_height),
+    m_data(display.m_data) {
+}
+
+Display::~Display() {
+    delete[] m_data;
 }
 
 size_t Display::width() const {
