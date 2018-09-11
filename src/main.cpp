@@ -114,6 +114,7 @@ void preview_mode(const size_t width,
 int main(int argc, char *argv[]) {
     const size_t width = 800, height = 600;
 
+    // TODO: there is no way to control amount of threads via CLI arguments
     if (argc < 2) {
         std::cerr << "./ray-tracer <scene-file> [output-file]"
                   << std::endl;
