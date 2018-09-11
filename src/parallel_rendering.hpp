@@ -1,5 +1,5 @@
-#ifndef PARALLEL_RENDERING_SCENE_HPP_
-#define PARALLEL_RENDERING_SCENE_HPP_
+#ifndef PARALLEL_RENDERING_HPP_
+#define PARALLEL_RENDERING_HPP_
 
 #include <thread>
 #include <vector>
@@ -7,9 +7,9 @@
 #include "row_marching.hpp"
 
 template <typename RowRendering>
-class ParallelRenderingScene {
+class ParallelRendering {
 public:
-    ParallelRenderingScene(RowRendering &&renderingScene,
+    ParallelRendering(RowRendering &&renderingScene,
                            size_t poolSize):
         m_renderingScene(std::move(renderingScene)),
         m_threadPool(poolSize),
@@ -51,10 +51,10 @@ private:
 };
 
 template <typename RowRendering>
-inline ParallelRenderingScene<RowRendering>
-mkParallelRenderingScene(RowRendering &&renderingScene,
+inline ParallelRendering<RowRendering>
+mkParallelRendering(RowRendering &&renderingScene,
                          size_t poolSize) {
-    return ParallelRenderingScene<RowRendering>(std::move(renderingScene), poolSize);
+    return ParallelRendering<RowRendering>(std::move(renderingScene), poolSize);
 }
 
-#endif  // PARALLEL_RENDERING_SCENE_HPP_
+#endif  // PARALLEL_RENDERING_HPP_

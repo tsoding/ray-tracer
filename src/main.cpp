@@ -18,7 +18,7 @@
 
 #include "./color.hpp"
 #include "./display.hpp"
-#include "./parallel_rendering_scene.hpp"
+#include "./parallel_rendering.hpp"
 #include "./progress.hpp"
 #include "./rand_rendering_scene.hpp"
 #include "./row_marching.hpp"
@@ -34,7 +34,7 @@ void file_render_mode(const size_t width,
     Display display(width, height);
 
     mkProgress(
-        mkParallelRenderingScene(
+        mkParallelRendering(
             mkRowMarching(
                 &scene,
                 &display),
