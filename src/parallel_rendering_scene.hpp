@@ -4,7 +4,7 @@
 #include <thread>
 #include <vector>
 
-#include "rendering_scene.hpp"
+#include "row_marching.hpp"
 
 template <typename RowRendering>
 class ParallelRenderingScene {

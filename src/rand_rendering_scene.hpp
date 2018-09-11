@@ -4,8 +4,6 @@
 #include <vector>
 #include <utility>
 
-#include "rendering_scene.hpp"
-
 template <typename RowRendering>
 class RandRenderingScene {
  public:

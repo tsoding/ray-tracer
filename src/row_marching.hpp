@@ -1,5 +1,5 @@
-#ifndef RENDERINGSCENE_HPP_
-#define RENDERINGSCENE_HPP_
+#ifndef ROW_MARCHING_HPP_
+#define ROW_MARCHING_HPP_
 
 #include <cassert>
 #include <vector>
@@ -53,4 +53,4 @@ mkRowMarching(const Scene *scene, Display *display) {
     return RowMarching<Display>(scene, display);
 }
 
-#endif  // RENDERINGSCENE_HPP_
+#endif  // ROW_MARCHING_HPP_

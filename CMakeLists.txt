@@ -15,7 +15,7 @@ set(RAY_TRACER_SOURCES
   src/display.hpp
   src/main.cpp
   src/rand_rendering_scene.hpp
-  src/rendering_scene.hpp
+  src/row_marching.hpp
   src/scene.cpp
   src/scene.hpp
   src/sphere.cpp

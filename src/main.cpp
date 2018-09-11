@@ -21,7 +21,7 @@
 #include "./parallel_rendering_scene.hpp"
 #include "./progress.hpp"
 #include "./rand_rendering_scene.hpp"
-#include "./rendering_scene.hpp"
+#include "./row_marching.hpp"
 #include "./scene.hpp"
 #include "./sphere.hpp"
 #include "./sprite_display.hpp"
