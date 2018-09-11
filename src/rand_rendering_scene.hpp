@@ -6,10 +6,10 @@
 
 #include "rendering_scene.hpp"
 
-template <typename Display>
+template <typename RowRendering>
 class RandRenderingScene {
  public:
-    explicit RandRenderingScene(RowMarching<Display> &&renderingScene):
+    explicit RandRenderingScene(RowRendering &&renderingScene):
         m_renderingScene(std::move(renderingScene)),
         m_row(0),
         m_shuffledRows(renderingScene.height()) {
@@ -42,15 +42,15 @@ class RandRenderingScene {
     }
 
  private:
-    RowMarching<Display> m_renderingScene;
+    RowRendering m_renderingScene;
     size_t m_row;
     std::vector<size_t> m_shuffledRows;
 };
 
-template <typename Display>
-inline RandRenderingScene<Display>
-mkRandRenderingScene(RowMarching<Display> &&renderingScene) {
-    return RandRenderingScene<Display>(std::move(renderingScene));
+template <typename RowRendering>
+inline RandRenderingScene<RowRendering>
+mkRandRenderingScene(RowRendering &&renderingScene) {
+    return RandRenderingScene<RowRendering>(std::move(renderingScene));
 }
 
 #endif  // RAND_RENDERING_SCENE_HPP_
