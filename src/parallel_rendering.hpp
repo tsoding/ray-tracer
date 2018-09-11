@@ -23,8 +23,9 @@ class ParallelRendering {
         }
 
         for (size_t i = 0; i < m_threadPool.size() && m_row < m_renderingScene.height(); ++i, ++m_row) {
-            m_threadPool[i] = std::thread([&] () {
-                m_renderingScene.renderRow(m_row);
+            const size_t row = m_row;
+            m_threadPool[i] = std::thread([this, row] () {
+                m_renderingScene.renderRow(row);
             });
         }
 

@@ -20,10 +20,10 @@
 #include "./display.hpp"
 #include "./parallel_rendering.hpp"
 #include "./progress.hpp"
-#include "./rand_rendering.hpp"
 #include "./row_marching.hpp"
 #include "./row_tracing.hpp"
 #include "./scene.hpp"
+#include "./shuffled_rows.hpp"
 #include "./sphere.hpp"
 #include "./sprite_display.hpp"
 #include "./vec.hpp"
@@ -48,22 +48,18 @@ void file_render_mode(const size_t width,
 void preview_mode(const size_t width,
                   const size_t height,
                   const std::string &scene_file) {
-    std::mt19937 gen { std::random_device {}() };
-    std::vector<size_t> ns(height);
-    std::iota(ns.begin(), ns.end(), 0);
-
     Scene scene = load_scene_from_file(scene_file);
     SpriteDisplay display(width, height);
 
-    // TODO(#75): preview mode does not support parallelization
     auto progress =
         mkProgress(
-            mkRandRendering(
-                mkRowMarching(
-                    &scene,
-                    &display)),
-            "Preview rendering",
-            10);
+            mkParallelRendering(
+                mkShuffledRows(
+                    mkRowMarching(
+                        &scene,
+                        &display)),
+                3),
+            "Preview rendering");
 
     sf::RenderWindow window(sf::VideoMode(static_cast<unsigned int>(width),
                                           static_cast<unsigned int>(height),
@@ -118,6 +114,7 @@ void preview_mode(const size_t width,
 int main(int argc, char *argv[]) {
     const size_t width = 800, height = 600;
 
+    // TODO(#79): there is no way to control amount of threads via CLI arguments
     if (argc < 2) {
         std::cerr << "./ray-tracer <scene-file> [output-file]"
                   << std::endl;
