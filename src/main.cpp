@@ -39,7 +39,7 @@ void file_render_mode(const size_t width,
             mkRowMarching(
                 &scene,
                 &display),
-            5),
+            3),
         "Rendering").start();
 
     display.save_as_ppm(output_file);
@@ -58,7 +58,7 @@ void preview_mode(const size_t width,
                     mkRowMarching(
                         &scene,
                         &display)),
-                5),
+                3),
             "Preview rendering");
 
     sf::RenderWindow window(sf::VideoMode(static_cast<unsigned int>(width),
