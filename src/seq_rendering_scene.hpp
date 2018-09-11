@@ -8,7 +8,7 @@
 template <typename Display>
 class SeqRenderingScene {
  public:
-    explicit SeqRenderingScene(RenderingScene<Display> &&renderingScene):
+    explicit SeqRenderingScene(RowMarching<Display> &&renderingScene):
         m_renderingScene(std::move(renderingScene)) {
     }
 
@@ -31,13 +31,13 @@ class SeqRenderingScene {
     }
 
  private:
-    RenderingScene<Display> m_renderingScene;
+    RowMarching<Display> m_renderingScene;
     size_t m_row;
 };
 
 template <typename Display>
 inline SeqRenderingScene<Display>
-mkSeqRenderingScene(RenderingScene<Display> &&renderingScene) {
+mkSeqRenderingScene(RowMarching<Display> &&renderingScene) {
     return SeqRenderingScene<Display>(std::move(renderingScene));
 }
 

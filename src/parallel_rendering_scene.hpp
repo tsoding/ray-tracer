@@ -9,7 +9,7 @@
 template <typename Display>     // Display::put has to be thread-safe
 class ParallelRenderingScene {
 public:
-    ParallelRenderingScene(RenderingScene<Display> &&renderingScene,
+    ParallelRenderingScene(RowMarching<Display> &&renderingScene,
                            size_t poolSize):
         m_renderingScene(std::move(renderingScene)),
         m_threadPool(poolSize),
@@ -45,14 +45,14 @@ public:
     }
 
 private:
-    RenderingScene<Display> m_renderingScene;
+    RowMarching<Display> m_renderingScene;
     std::vector<std::thread> m_threadPool;
     size_t m_row;
 };
 
 template <typename Display>
 inline ParallelRenderingScene<Display>
-mkParallelRenderingScene(RenderingScene<Display> &&renderingScene,
+mkParallelRenderingScene(RowMarching<Display> &&renderingScene,
                          size_t poolSize) {
     return ParallelRenderingScene<Display>(std::move(renderingScene), poolSize);
 }

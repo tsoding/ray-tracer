@@ -36,7 +36,7 @@ void file_render_mode(const size_t width,
 
     mkProgress(
         mkParallelRenderingScene(
-            mkRenderingScene(
+            mkRowMarching(
                 &scene,
                 &display),
             3),
@@ -59,7 +59,7 @@ void preview_mode(const size_t width,
     auto progress =
         mkProgress(
             mkRandRenderingScene(
-                mkRenderingScene(
+                mkRowMarching(
                     &scene,
                     &display)),
             "Preview rendering",

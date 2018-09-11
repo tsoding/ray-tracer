@@ -9,7 +9,7 @@
 template <typename Display>
 class RandRenderingScene {
  public:
-    explicit RandRenderingScene(RenderingScene<Display> &&renderingScene):
+    explicit RandRenderingScene(RowMarching<Display> &&renderingScene):
         m_renderingScene(std::move(renderingScene)),
         m_row(0),
         m_shuffledRows(renderingScene.height()) {
@@ -42,14 +42,14 @@ class RandRenderingScene {
     }
 
  private:
-    RenderingScene<Display> m_renderingScene;
+    RowMarching<Display> m_renderingScene;
     size_t m_row;
     std::vector<size_t> m_shuffledRows;
 };
 
 template <typename Display>
 inline RandRenderingScene<Display>
-mkRandRenderingScene(RenderingScene<Display> &&renderingScene) {
+mkRandRenderingScene(RowMarching<Display> &&renderingScene) {
     return RandRenderingScene<Display>(std::move(renderingScene));
 }
 

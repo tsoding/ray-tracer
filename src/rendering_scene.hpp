@@ -8,12 +8,12 @@
 #include "display.hpp"
 
 template <typename D>
-class RenderingScene {
+class RowMarching {
  public:
     using Display = D;
 
-    RenderingScene(const Scene *scene,
-                   Display *display):
+    RowMarching(const Scene *scene,
+                Display *display):
         m_scene(scene),
         m_display(display) {
         assert(scene);
@@ -46,11 +46,11 @@ class RenderingScene {
     Display * const m_display;
 };
 
-// \brief RenderingScene ctor with template param inference
+// \brief RowMarching ctor with template param inference
 template <typename Display>
-inline RenderingScene<Display>
-mkRenderingScene(const Scene *scene, Display *display) {
-    return RenderingScene<Display>(scene, display);
+inline RowMarching<Display>
+mkRowMarching(const Scene *scene, Display *display) {
+    return RowMarching<Display>(scene, display);
 }
 
 #endif  // RENDERINGSCENE_HPP_
