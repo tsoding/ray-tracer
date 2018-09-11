@@ -6,10 +6,10 @@
 
 #include "rendering_scene.hpp"
 
-template <typename Display>     // Display::put has to be thread-safe
+template <typename RowRendering>
 class ParallelRenderingScene {
 public:
-    ParallelRenderingScene(RowMarching<Display> &&renderingScene,
+    ParallelRenderingScene(RowRendering &&renderingScene,
                            size_t poolSize):
         m_renderingScene(std::move(renderingScene)),
         m_threadPool(poolSize),
@@ -45,16 +45,16 @@ public:
     }
 
 private:
-    RowMarching<Display> m_renderingScene;
+    RowRendering m_renderingScene;
     std::vector<std::thread> m_threadPool;
     size_t m_row;
 };
 
-template <typename Display>
-inline ParallelRenderingScene<Display>
-mkParallelRenderingScene(RowMarching<Display> &&renderingScene,
+template <typename RowRendering>
+inline ParallelRenderingScene<RowRendering>
+mkParallelRenderingScene(RowRendering &&renderingScene,
                          size_t poolSize) {
-    return ParallelRenderingScene<Display>(std::move(renderingScene), poolSize);
+    return ParallelRenderingScene<RowRendering>(std::move(renderingScene), poolSize);
 }
 
 #endif  // PARALLEL_RENDERING_SCENE_HPP_
