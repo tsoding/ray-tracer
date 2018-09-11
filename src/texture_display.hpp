@@ -2,6 +2,7 @@
 #define TEXTURE_DISPLAY_HPP_
 
 #include <vector>
+#include <memory>
 
 #include <SFML/Graphics.hpp>    // NOLINT
 
@@ -22,7 +23,7 @@ class TextureDisplay {
  private:
     const size_t m_width;
     const size_t m_height;
-    std::vector<sf::Uint8> m_buffer;
+    std::unique_ptr<sf::Uint8[]> m_buffer;
     sf::Texture m_texture;
 };
 

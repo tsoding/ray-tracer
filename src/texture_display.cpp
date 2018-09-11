@@ -3,10 +3,11 @@
 TextureDisplay::TextureDisplay(size_t width, size_t height):
     m_width(width),
     m_height(height),
-    m_buffer(width * height * 4) {
+    m_buffer(new sf::Uint8[width * height * 4]) {
     m_texture.create(static_cast<unsigned int>(width),
                      static_cast<unsigned int>(height));
 }
+
 
 size_t TextureDisplay::width() const {
     return m_width;
@@ -24,10 +25,10 @@ void TextureDisplay::put(size_t row, size_t col, const color &c) {
 }
 
 const sf::Texture &TextureDisplay::texture() {
-    m_texture.update(m_buffer.data());
+    m_texture.update(m_buffer.get());
     return m_texture;
 }
 
 void TextureDisplay::clean() {
-    std::fill(m_buffer.begin(), m_buffer.end(), 0);
+    std::fill(m_buffer.get(), m_buffer.get() + m_width * m_height * 4, 0);
 }

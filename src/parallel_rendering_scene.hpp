@@ -1,0 +1,60 @@
+#ifndef PARALLEL_RENDERING_SCENE_HPP_
+#define PARALLEL_RENDERING_SCENE_HPP_
+
+#include <thread>
+#include <vector>
+
+#include "rendering_scene.hpp"
+
+template <typename Display>     // Display::put has to be thread-safe
+class ParallelRenderingScene {
+public:
+    ParallelRenderingScene(RenderingScene<Display> &&renderingScene,
+                           size_t poolSize):
+        m_renderingScene(std::move(renderingScene)),
+        m_threadPool(poolSize),
+        m_row(0)
+    {}
+
+    inline void progressDo() {
+        if (progressWork() >= progressGoal()) {
+            return;
+        }
+
+        for (size_t i = 0; i < m_threadPool.size() && m_row < m_renderingScene.height(); ++i, ++m_row) {
+            m_threadPool[i] = std::thread([&] () {
+                m_renderingScene.renderRow(m_row);
+            });
+        }
+
+        for (size_t i = 0; i < m_threadPool.size(); ++i) {
+            m_threadPool[i].join();
+        }
+    }
+
+    inline size_t progressWork() const {
+        return m_row;
+    }
+
+    inline size_t progressGoal() const {
+        return m_renderingScene.height();
+    }
+
+    inline void progressReset() {
+        m_row = 0;
+    }
+
+private:
+    RenderingScene<Display> m_renderingScene;
+    std::vector<std::thread> m_threadPool;
+    size_t m_row;
+};
+
+template <typename Display>
+inline ParallelRenderingScene<Display>
+mkParallelRenderingScene(RenderingScene<Display> &&renderingScene,
+                         size_t poolSize) {
+    return ParallelRenderingScene<Display>(std::move(renderingScene), poolSize);
+}
+
+#endif  // PARALLEL_RENDERING_SCENE_HPP_
