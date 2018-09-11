@@ -1,14 +1,15 @@
 #ifndef PARALLEL_RENDERING_HPP_
 #define PARALLEL_RENDERING_HPP_
 
-#include <thread>
+#include <thread>               // NOLINT
 #include <vector>
+#include <utility>
 
 #include "row_marching.hpp"
 
 template <typename RowRendering>
 class ParallelRendering {
-public:
+ public:
     ParallelRendering(RowRendering &&renderingScene,
                            size_t poolSize):
         m_renderingScene(std::move(renderingScene)),
@@ -44,7 +45,7 @@ public:
         m_row = 0;
     }
 
-private:
+ private:
     RowRendering m_renderingScene;
     std::vector<std::thread> m_threadPool;
     size_t m_row;

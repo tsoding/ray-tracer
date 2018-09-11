@@ -7,11 +7,9 @@
 #include "scene.hpp"
 #include "display.hpp"
 
-template <typename D>
+template <typename Display>
 class RowMarching {
  public:
-    using Display = D;
-
     RowMarching(const Scene *scene,
                 Display *display):
         m_scene(scene),
