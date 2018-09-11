@@ -16,11 +16,11 @@ set(RAY_TRACER_SOURCES
   src/main.cpp
   src/parallel_rendering.hpp
   src/progress.hpp
-  src/rand_rendering.hpp
   src/row_marching.hpp
   src/row_tracing.hpp
   src/scene.cpp
   src/scene.hpp
+  src/shuffled_rows.hpp
   src/sphere.cpp
   src/sphere.hpp
   src/sprite_display.cpp
