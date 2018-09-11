@@ -48,10 +48,6 @@ void file_render_mode(const size_t width,
 void preview_mode(const size_t width,
                   const size_t height,
                   const std::string &scene_file) {
-    std::mt19937 gen { std::random_device {}() };
-    std::vector<size_t> ns(height);
-    std::iota(ns.begin(), ns.end(), 0);
-
     Scene scene = load_scene_from_file(scene_file);
     SpriteDisplay display(width, height);
 
