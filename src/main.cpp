@@ -23,7 +23,6 @@
 #include "./rand_rendering_scene.hpp"
 #include "./rendering_scene.hpp"
 #include "./scene.hpp"
-#include "./seq_rendering_scene.hpp"
 #include "./sphere.hpp"
 #include "./sprite_display.hpp"
 #include "./vec.hpp"
