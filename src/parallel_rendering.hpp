@@ -1,15 +1,16 @@
-#ifndef PARALLEL_RENDERING_SCENE_HPP_
-#define PARALLEL_RENDERING_SCENE_HPP_
+#ifndef PARALLEL_RENDERING_HPP_
+#define PARALLEL_RENDERING_HPP_
 
-#include <thread>
+#include <thread>               // NOLINT
 #include <vector>
+#include <utility>
 
-#include "rendering_scene.hpp"
+#include "row_marching.hpp"
 
-template <typename Display>     // Display::put has to be thread-safe
-class ParallelRenderingScene {
-public:
-    ParallelRenderingScene(RenderingScene<Display> &&renderingScene,
+template <typename RowRendering>
+class ParallelRendering {
+ public:
+    ParallelRendering(RowRendering &&renderingScene,
                            size_t poolSize):
         m_renderingScene(std::move(renderingScene)),
         m_threadPool(poolSize),
@@ -44,17 +45,17 @@ public:
         m_row = 0;
     }
 
-private:
-    RenderingScene<Display> m_renderingScene;
+ private:
+    RowRendering m_renderingScene;
     std::vector<std::thread> m_threadPool;
     size_t m_row;
 };
 
-template <typename Display>
-inline ParallelRenderingScene<Display>
-mkParallelRenderingScene(RenderingScene<Display> &&renderingScene,
+template <typename RowRendering>
+inline ParallelRendering<RowRendering>
+mkParallelRendering(RowRendering &&renderingScene,
                          size_t poolSize) {
-    return ParallelRenderingScene<Display>(std::move(renderingScene), poolSize);
+    return ParallelRendering<RowRendering>(std::move(renderingScene), poolSize);
 }
 
-#endif  // PARALLEL_RENDERING_SCENE_HPP_
+#endif  // PARALLEL_RENDERING_HPP_

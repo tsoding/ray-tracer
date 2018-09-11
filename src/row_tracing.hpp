@@ -1,19 +1,11 @@
-#ifndef RENDERINGSCENE_HPP_
-#define RENDERINGSCENE_HPP_
+#ifndef ROW_TRACING_HPP_
+#define ROW_TRACING_HPP_
 
-#include <cassert>
-#include <vector>
-
-#include "scene.hpp"
-#include "display.hpp"
-
-template <typename D>
-class RenderingScene {
+template <typename Display>
+class RowTracing {
  public:
-    using Display = D;
-
-    RenderingScene(const Scene *scene,
-                   Display *display):
+    RowTracing(const Scene *scene,
+               Display *display):
         m_scene(scene),
         m_display(display) {
         assert(scene);
@@ -30,7 +22,7 @@ class RenderingScene {
                                     0.0f };
 
             m_display->put(row, col,
-                           march(static_cast<float>(col) - half_width,
+                           trace(static_cast<float>(col) - half_width,
                                  static_cast<float>(row) - half_height,
                                  *m_scene,
                                  normalize(p - m_scene->eye)));
@@ -46,11 +38,10 @@ class RenderingScene {
     Display * const m_display;
 };
 
-// \brief RenderingScene ctor with template param inference
 template <typename Display>
-inline RenderingScene<Display>
-mkRenderingScene(const Scene *scene, Display *display) {
-    return RenderingScene<Display>(scene, display);
+inline RowTracing<Display>
+mkRowTracing(const Scene *scene, Display *display) {
+    return RowTracing<Display>(scene, display);
 }
 
-#endif  // RENDERINGSCENE_HPP_
+#endif  // ROW_TRACING_HPP_

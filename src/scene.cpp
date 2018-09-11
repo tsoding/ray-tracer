@@ -96,3 +96,8 @@ color march(float x, float y,
 
     return {0.0f, 0.0f, 0.0f};
 }
+
+color trace(float x, float y, const Scene &scene, vec3<float> dir) {
+    // TODO(#77): trace() function is not implemented
+    return color{0.0f, 0.0f, 0.0f};
+}

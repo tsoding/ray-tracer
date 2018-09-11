@@ -1,15 +1,13 @@
-#ifndef RAND_RENDERING_SCENE_HPP_
-#define RAND_RENDERING_SCENE_HPP_
+#ifndef RAND_RENDERING_HPP_
+#define RAND_RENDERING_HPP_
 
 #include <vector>
 #include <utility>
 
-#include "rendering_scene.hpp"
-
-template <typename Display>
-class RandRenderingScene {
+template <typename RowRendering>
+class RandRendering {
  public:
-    explicit RandRenderingScene(RenderingScene<Display> &&renderingScene):
+    explicit RandRendering(RowRendering &&renderingScene):
         m_renderingScene(std::move(renderingScene)),
         m_row(0),
         m_shuffledRows(renderingScene.height()) {
@@ -42,15 +40,15 @@ class RandRenderingScene {
     }
 
  private:
-    RenderingScene<Display> m_renderingScene;
+    RowRendering m_renderingScene;
     size_t m_row;
     std::vector<size_t> m_shuffledRows;
 };
 
-template <typename Display>
-inline RandRenderingScene<Display>
-mkRandRenderingScene(RenderingScene<Display> &&renderingScene) {
-    return RandRenderingScene<Display>(std::move(renderingScene));
+template <typename RowRendering>
+inline RandRendering<RowRendering>
+mkRandRendering(RowRendering &&renderingScene) {
+    return RandRendering<RowRendering>(std::move(renderingScene));
 }
 
-#endif  // RAND_RENDERING_SCENE_HPP_
+#endif  // RAND_RENDERING_HPP_

@@ -4,10 +4,10 @@
 #include <iostream>
 #include <string>
 #include <type_traits>
+#include <utility>
 
 template <typename T>
-class Progress
-{
+class Progress {
  public:
     using PartialWork = T;
 
