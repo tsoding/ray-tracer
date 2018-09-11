@@ -20,7 +20,7 @@
 #include "./display.hpp"
 #include "./parallel_rendering.hpp"
 #include "./progress.hpp"
-#include "./rand_rendering_scene.hpp"
+#include "./rand_rendering.hpp"
 #include "./row_marching.hpp"
 #include "./scene.hpp"
 #include "./sphere.hpp"
@@ -57,7 +57,7 @@ void preview_mode(const size_t width,
     // TODO(#75): preview mode does not support parallelization
     auto progress =
         mkProgress(
-            mkRandRenderingScene(
+            mkRandRendering(
                 mkRowMarching(
                     &scene,
                     &display)),
