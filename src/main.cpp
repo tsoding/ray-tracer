@@ -20,10 +20,10 @@
 #include "./display.hpp"
 #include "./parallel_rendering.hpp"
 #include "./progress.hpp"
-#include "./rand_rendering.hpp"
 #include "./row_marching.hpp"
 #include "./row_tracing.hpp"
 #include "./scene.hpp"
+#include "./shuffled_rows.hpp"
 #include "./sphere.hpp"
 #include "./sprite_display.hpp"
 #include "./vec.hpp"
@@ -39,7 +39,7 @@ void file_render_mode(const size_t width,
             mkRowMarching(
                 &scene,
                 &display),
-            3),
+            5),
         "Rendering").start();
 
     display.save_as_ppm(output_file);
@@ -55,15 +55,15 @@ void preview_mode(const size_t width,
     Scene scene = load_scene_from_file(scene_file);
     SpriteDisplay display(width, height);
 
-    // TODO(#75): preview mode does not support parallelization
     auto progress =
         mkProgress(
-            mkRandRendering(
-                mkRowMarching(
-                    &scene,
-                    &display)),
-            "Preview rendering",
-            10);
+            mkParallelRendering(
+                mkShuffledRows(
+                    mkRowMarching(
+                        &scene,
+                        &display)),
+                5),
+            "Preview rendering");
 
     sf::RenderWindow window(sf::VideoMode(static_cast<unsigned int>(width),
                                           static_cast<unsigned int>(height),
