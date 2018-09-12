@@ -16,6 +16,7 @@
 
 #include <SFML/Graphics.hpp>    // NOLINT
 
+#include "./arguments.hpp"
 #include "./color.hpp"
 #include "./display.hpp"
 #include "./parallel_rendering.hpp"
@@ -30,25 +31,25 @@
 
 void file_render_mode(const size_t width,
                       const size_t height,
-                      const std::string &output_file,
-                      const Scene &scene) {
+                      const Arguments &arguments) {
     Display display(width, height);
+    Scene scene = load_scene_from_file(arguments.sceneFile());
 
     mkProgress(
         mkParallelRendering(
             mkRowMarching(
                 &scene,
                 &display),
-            3),
+            arguments.threadCount()),
         "Rendering").start();
 
-    display.save_as_ppm(output_file);
+    display.save_as_ppm(arguments.outputFile());
 }
 
 void preview_mode(const size_t width,
                   const size_t height,
-                  const std::string &scene_file) {
-    Scene scene = load_scene_from_file(scene_file);
+                  const Arguments &arguments) {
+    Scene scene = load_scene_from_file(arguments.sceneFile());
     SpriteDisplay display(width, height);
 
     auto progress =
@@ -58,7 +59,7 @@ void preview_mode(const size_t width,
                     mkRowMarching(
                         &scene,
                         &display)),
-                3),
+                arguments.threadCount()),
             "Preview rendering");
 
     sf::RenderWindow window(sf::VideoMode(static_cast<unsigned int>(width),
@@ -90,7 +91,7 @@ void preview_mode(const size_t width,
                     window.close();
                     break;
                 case sf::Keyboard::R:
-                    scene = load_scene_from_file(scene_file);
+                    scene = load_scene_from_file(arguments.sceneFile());
                     display.clean();
                     progress.progressReset();
                     break;
@@ -112,26 +113,20 @@ void preview_mode(const size_t width,
 }
 
 int main(int argc, char *argv[]) {
+    // TODO(#81): there is not way to parametrize the size of Display via CLI arguments
     const size_t width = 800, height = 600;
 
-    // TODO(#79): there is no way to control amount of threads via CLI arguments
-    if (argc < 2) {
-        std::cerr << "./ray-tracer <scene-file> [output-file]"
-                  << std::endl;
+    Arguments arguments(argc, argv);
+
+    if (!arguments.verify()) {
+        arguments.help();
         return -1;
     }
 
-    const std::string scene_file(argv[1]);
-    const std::string output_file =
-        argc >= 3
-        ? std::string(argv[2])
-        : std::string();
-
-    if (!output_file.empty()) {
-        const auto scene = load_scene_from_file(scene_file);
-        file_render_mode(width, height, output_file, scene);
+    if (!arguments.outputFile().empty()) {
+        file_render_mode(width, height, arguments);
     } else {
-        preview_mode(width, height, scene_file);
+        preview_mode(width, height, arguments);
     }
 
     return 0;

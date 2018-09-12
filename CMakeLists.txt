@@ -9,6 +9,8 @@ find_package(Threads REQUIRED)
 include_directories(${SFML_INCLUDE_DIR})
 
 set(RAY_TRACER_SOURCES
+  src/arguments.cpp
+  src/arguments.hpp
   src/color.cpp
   src/color.hpp
   src/display.cpp
