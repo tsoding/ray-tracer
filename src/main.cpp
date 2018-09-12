@@ -31,19 +31,19 @@
 
 void file_render_mode(const size_t width,
                       const size_t height,
-                      const std::string &output_file,
-                      const Scene &scene) {
+                      const Arguments &arguments) {
     Display display(width, height);
+    Scene scene = load_scene_from_file(arguments.sceneFile());
 
     mkProgress(
         mkParallelRendering(
             mkRowMarching(
                 &scene,
                 &display),
-            3),
+            arguments.threadCount()),
         "Rendering").start();
 
-    display.save_as_ppm(output_file);
+    display.save_as_ppm(arguments.outputFile());
 }
 
 void preview_mode(const size_t width,
@@ -124,7 +124,7 @@ int main(int argc, char *argv[]) {
 
     if (!arguments.outputFile().empty()) {
         const auto scene = load_scene_from_file(arguments.outputFile());
-        file_render_mode(width, height, arguments.outputFile(), scene);
+        file_render_mode(width, height, arguments);
     } else {
         preview_mode(width, height, arguments.sceneFile());
     }
