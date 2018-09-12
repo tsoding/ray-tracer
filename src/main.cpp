@@ -113,6 +113,7 @@ void preview_mode(const size_t width,
 }
 
 int main(int argc, char *argv[]) {
+    // TODO(#81): there is not way to parametrize the size of Display via CLI arguments
     const size_t width = 800, height = 600;
 
     Arguments arguments(argc, argv);
