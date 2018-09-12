@@ -10,6 +10,8 @@ class Arguments {
     std::string sceneFile() const;
     std::string outputFile() const;
     size_t threadCount() const;
+    size_t width() const;
+    size_t height() const;
 
     bool verify();
 
@@ -22,6 +24,8 @@ class Arguments {
     std::string m_sceneFile;
     std::string m_outputFile;
     size_t m_threadCount;
+    size_t m_width;
+    size_t m_height;
 };
 
 #endif  // ARGUMENTS_HPP_
