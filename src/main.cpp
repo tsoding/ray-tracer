@@ -29,10 +29,8 @@
 #include "./sprite_display.hpp"
 #include "./vec.hpp"
 
-void file_render_mode(const size_t width,
-                      const size_t height,
-                      const Arguments &arguments) {
-    Display display(width, height);
+void file_render_mode(const Arguments &arguments) {
+    Display display(arguments.width(), arguments.height());
     Scene scene = load_scene_from_file(arguments.sceneFile());
 
     mkProgress(
@@ -46,11 +44,9 @@ void file_render_mode(const size_t width,
     display.save_as_ppm(arguments.outputFile());
 }
 
-void preview_mode(const size_t width,
-                  const size_t height,
-                  const Arguments &arguments) {
+void preview_mode(const Arguments &arguments) {
     Scene scene = load_scene_from_file(arguments.sceneFile());
-    SpriteDisplay display(width, height);
+    SpriteDisplay display(arguments.width(), arguments.height());
 
     auto progress =
         mkProgress(
@@ -62,8 +58,8 @@ void preview_mode(const size_t width,
                 arguments.threadCount()),
             "Preview rendering");
 
-    sf::RenderWindow window(sf::VideoMode(static_cast<unsigned int>(width),
-                                          static_cast<unsigned int>(height),
+    sf::RenderWindow window(sf::VideoMode(static_cast<unsigned int>(arguments.width()),
+                                          static_cast<unsigned int>(arguments.height()),
                                           32),
                             "Ray Tracer");
     window.setFramerateLimit(0);
@@ -113,9 +109,6 @@ void preview_mode(const size_t width,
 }
 
 int main(int argc, char *argv[]) {
-    // TODO(#81): there is not way to parametrize the size of Display via CLI arguments
-    const size_t width = 800, height = 600;
-
     Arguments arguments(argc, argv);
 
     if (!arguments.verify()) {
@@ -124,9 +117,9 @@ int main(int argc, char *argv[]) {
     }
 
     if (!arguments.outputFile().empty()) {
-        file_render_mode(width, height, arguments);
+        file_render_mode(arguments);
     } else {
-        preview_mode(width, height, arguments);
+        preview_mode(arguments);
     }
 
     return 0;
