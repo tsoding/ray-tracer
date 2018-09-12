@@ -17,7 +17,7 @@ std::string Arguments::outputFile() const {
     return m_outputFile;
 }
 
-int Arguments::threadCount() const {
+size_t Arguments::threadCount() const {
     return m_threadCount;
 }
 
@@ -27,7 +27,7 @@ bool Arguments::verify() {
     for (; i < m_argc; ++i) {
         if (m_argv[i][0] == '-') {
             if (m_argv[i] == std::string("-j")) {
-                m_threadCount = std::stoi(m_argv[++i]);
+                m_threadCount = std::stoul(m_argv[++i]);
             } else {
                 std::cerr << "Unexpected option: "
                           << m_argv[i]
