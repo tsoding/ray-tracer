@@ -37,7 +37,7 @@ bool Arguments::verify() {
     for (; i < m_argc; ++i) {
         if (m_argv[i][0] == '-') {
             if (m_argv[i] == std::string("-j")) {
-                // TODO: Arguments option parsing doesn't check if the parameter of option is available
+                // TODO(#83): Arguments option parsing doesn't check if the parameter of option is available
                 m_threadCount = std::stoul(m_argv[++i]);
             } else if (m_argv[i] == std::string("-w")) {
                 m_width = std::stoul(m_argv[++i]);
