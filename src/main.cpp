@@ -48,8 +48,8 @@ void file_render_mode(const size_t width,
 
 void preview_mode(const size_t width,
                   const size_t height,
-                  const std::string &scene_file) {
-    Scene scene = load_scene_from_file(scene_file);
+                  const Arguments &arguments) {
+    Scene scene = load_scene_from_file(arguments.sceneFile());
     SpriteDisplay display(width, height);
 
     auto progress =
@@ -59,7 +59,7 @@ void preview_mode(const size_t width,
                     mkRowMarching(
                         &scene,
                         &display)),
-                3),
+                arguments.threadCount()),
             "Preview rendering");
 
     sf::RenderWindow window(sf::VideoMode(static_cast<unsigned int>(width),
@@ -91,7 +91,7 @@ void preview_mode(const size_t width,
                     window.close();
                     break;
                 case sf::Keyboard::R:
-                    scene = load_scene_from_file(scene_file);
+                    scene = load_scene_from_file(arguments.sceneFile());
                     display.clean();
                     progress.progressReset();
                     break;
@@ -123,10 +123,9 @@ int main(int argc, char *argv[]) {
     }
 
     if (!arguments.outputFile().empty()) {
-        const auto scene = load_scene_from_file(arguments.outputFile());
         file_render_mode(width, height, arguments);
     } else {
-        preview_mode(width, height, arguments.sceneFile());
+        preview_mode(width, height, arguments);
     }
 
     return 0;
