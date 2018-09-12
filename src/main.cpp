@@ -16,6 +16,7 @@
 
 #include <SFML/Graphics.hpp>    // NOLINT
 
+#include "./arguments.hpp"
 #include "./color.hpp"
 #include "./display.hpp"
 #include "./parallel_rendering.hpp"
@@ -114,24 +115,18 @@ void preview_mode(const size_t width,
 int main(int argc, char *argv[]) {
     const size_t width = 800, height = 600;
 
-    // TODO(#79): there is no way to control amount of threads via CLI arguments
-    if (argc < 2) {
-        std::cerr << "./ray-tracer <scene-file> [output-file]"
-                  << std::endl;
+    Arguments arguments(argc, argv);
+
+    if (!arguments.verify()) {
+        arguments.help();
         return -1;
     }
 
-    const std::string scene_file(argv[1]);
-    const std::string output_file =
-        argc >= 3
-        ? std::string(argv[2])
-        : std::string();
-
-    if (!output_file.empty()) {
-        const auto scene = load_scene_from_file(scene_file);
-        file_render_mode(width, height, output_file, scene);
+    if (!arguments.outputFile().empty()) {
+        const auto scene = load_scene_from_file(arguments.outputFile());
+        file_render_mode(width, height, arguments.outputFile(), scene);
     } else {
-        preview_mode(width, height, scene_file);
+        preview_mode(width, height, arguments.sceneFile());
     }
 
     return 0;
