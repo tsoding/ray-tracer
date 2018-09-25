@@ -35,7 +35,7 @@ void file_render_mode(const Arguments &arguments) {
 
     mkProgress(
         mkParallelRendering(
-            mkRowMarching(
+            mkRowTracing(
                 &scene,
                 &display),
             arguments.threadCount()),
@@ -52,7 +52,7 @@ void preview_mode(const Arguments &arguments) {
         mkProgress(
             mkParallelRendering(
                 mkShuffledRows(
-                    mkRowMarching(
+                    mkRowTracing(
                         &scene,
                         &display)),
                 arguments.threadCount()),
