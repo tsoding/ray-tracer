@@ -97,7 +97,7 @@ color march(float x, float y,
     return {0.0f, 0.0f, 0.0f};
 }
 
-// TODO: solve_plane_line is not a very descriptive name
+// TODO(#85): solve_plane_line is not a very descriptive name
 float solve_plane_line(const plane &p,
                        const v3f &line_start,
                        const v3f &line_direction) {
