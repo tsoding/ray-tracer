@@ -104,7 +104,7 @@ float solve_plane_line(const plane &p,
     const float A = p.v[0], B = p.v[1], C = p.v[2], D = p.v[3];
     const float x1 = line_start.v[0], y1 = line_start.v[1], z1 = line_start.v[2];
     const float dx = line_direction.v[0], dy = line_direction.v[1], dz = line_direction.v[2];
-    // TODO: GachiPls division by zero
+    // TODO: possible division by zero in solve_plane_line
     const float t = - (A * x1 + B * y1 + C * z1 + D) / (A * dx + B * dy + C * dz);
     return t;
 }
@@ -114,7 +114,7 @@ color trace(float x, float y, const Scene &scene, const vec3<float> &dir) {
 
     bool found = false;
     vec3<float> closest_point;
-    color closest_color;
+    color closest_color = {0.0f, 0.0f, 0.0f};
     size_t id = 0;
 
     for (size_t i = 0; i < scene.walls.size(); ++i) {
@@ -138,6 +138,10 @@ color trace(float x, float y, const Scene &scene, const vec3<float> &dir) {
             }
         }
     }
+
+    // TODO: trace() does not support shadows
+    // TODO: trace() does not support spheres
+    // TODO: trace() does not support triangles
 
     return closest_color;
 }
