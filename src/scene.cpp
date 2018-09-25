@@ -104,7 +104,7 @@ float solve_plane_line(const plane &p,
     const float A = p.v[0], B = p.v[1], C = p.v[2], D = p.v[3];
     const float x1 = line_start.v[0], y1 = line_start.v[1], z1 = line_start.v[2];
     const float dx = line_direction.v[0], dy = line_direction.v[1], dz = line_direction.v[2];
-    // TODO: possible division by zero in solve_plane_line
+    // TODO(#86): possible division by zero in solve_plane_line
     const float t = - (A * x1 + B * y1 + C * z1 + D) / (A * dx + B * dy + C * dz);
     return t;
 }
