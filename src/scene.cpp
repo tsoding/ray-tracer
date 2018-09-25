@@ -141,7 +141,7 @@ color trace(float x, float y, const Scene &scene, const vec3<float> &dir) {
 
     // TODO(#87): trace() does not support shadows
     // TODO(#88): trace() does not support spheres
-    // TODO: trace() does not support triangles
+    // TODO(#89): trace() does not support triangles
 
     return closest_color;
 }
