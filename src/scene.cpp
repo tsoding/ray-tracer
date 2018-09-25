@@ -115,7 +115,6 @@ color trace(float x, float y, const Scene &scene, const vec3<float> &dir) {
     bool found = false;
     vec3<float> closest_point;
     color closest_color = {0.0f, 0.0f, 0.0f};
-    size_t id = 0;
 
     for (size_t i = 0; i < scene.walls.size(); ++i) {
         const float t = solve_plane_line(scene.walls[i].p, ray, dir);
@@ -128,13 +127,11 @@ color trace(float x, float y, const Scene &scene, const vec3<float> &dir) {
             found = true;
             closest_point = ray + t * dir;
             closest_color = scene.walls[i].c;
-            id = i;
         } else {
             const vec3<float> new_closest_point = ray + t * dir;
             if (len(ray - new_closest_point) < len(ray - closest_point)) {
                 closest_point = new_closest_point;
                 closest_color = scene.walls[i].c;
-                id = i;
             }
         }
     }
