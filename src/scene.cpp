@@ -145,7 +145,7 @@ color trace(float x, float y, const Scene &scene, const vec3<float> &dir) {
     }
 
     // TODO(#96): sphere is always visible even if it's behind something
-    // TODO: spheres do not reflect the rays
+    // TODO(#97): spheres do not reflect the rays
 
     for (size_t i = 0; i < scene.spheres.size(); ++i) {
         const float d = disc(ray, dir,
