@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -132,9 +133,10 @@ color trace(float x, float y, const Scene &scene, const vec3<float> &dir) {
         }
     }
 
-    // TODO(#87): trace() does not support shadows
     // TODO(#88): trace() does not support spheres
     // TODO(#89): trace() does not support triangles
 
-    return closest_color;
+    const float max_ray_length = 600.0f;
+
+    return closest_color * (1.0f - std::min(max_ray_length, len(closest_point - ray)) / max_ray_length);
 }
