@@ -54,4 +54,3 @@ target_link_libraries(ray-tracer ${SFML_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
 include(CppLint)
 add_cpp_lint_target(lint "${RAY_TRACER_SOURCES}")
-add_dependencies(ray-tracer lint)
