@@ -11,7 +11,7 @@ struct Ray
     v3f origin;
     v3f dir;
     Color color;
-    bool obsorbed;
+    bool absorbed;
 };
 
 Ray collide_ray_with_sphere(const Ray &ray, const Sphere &sphere);
