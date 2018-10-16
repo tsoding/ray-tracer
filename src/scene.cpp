@@ -99,17 +99,6 @@ Color march(float x, float y,
     return {0.0f, 0.0f, 0.0f};
 }
 
-template <typename T>
-T sqr(T x) {
-    return x * x;
-}
-
-// https://en.wikipedia.org/wiki/Line%E2%80%93sphere_intersection
-float disc(const v3f &o, const v3f &l,  // line
-           const v3f &c, float r) {     // sphere
-    return sqr(dot(l, o - c)) - sqr(len(o - c)) + sqr(r);
-}
-
 Color trace(float x, float y, const Scene &scene, const vec3<float> &dir) {
     Ray ray = {
        {x, y, 0.0f},
@@ -140,18 +129,7 @@ Color trace(float x, float y, const Scene &scene, const vec3<float> &dir) {
         ray = next_ray;
     }
 
-    // TODO(#96): sphere is always visible even if it's behind something
     // TODO(#97): spheres do not reflect the rays
-
-    for (size_t i = 0; i < scene.spheres.size(); ++i) {
-        const float d = disc(ray.origin, ray.dir,
-                             scene.spheres[i].center,
-                             scene.spheres[i].radius);
-        if (d >= 0.0f) {
-            return Color{0.0f, 0.0f, 1.0f};
-        }
-    }
-
     // TODO(#89): trace() does not support triangles
 
     // TODO: shadows are broke in trace()

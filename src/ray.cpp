@@ -3,6 +3,17 @@
 const float WORLD_HORIZON_FACTOR = 10000.0;
 const Color WORLD_SKYBOX_COLOR = Color{0.0f, 0.0f, 0.0f};
 
+template <typename T>
+static T sqr(T x) {
+    return x * x;
+}
+
+// https://en.wikipedia.org/wiki/Line%E2%80%93sphere_intersection
+static float disc(const v3f &o, const v3f &l,  // line
+           const v3f &c, float r) {     // sphere
+    return sqr(dot(l, o - c)) - sqr(len(o - c)) + sqr(r);
+}
+
 Ray void_ray(const Ray &ray)
 {
     return {
@@ -13,9 +24,26 @@ Ray void_ray(const Ray &ray)
     };
 }
 
+Ray absorb_ray(const Ray &ray, const Color &color)
+{
+    return {
+        ray.origin,
+        ray.dir,
+        color,
+        true
+    };
+}
+
 Ray collide_ray_with_sphere(const Ray &ray, const Sphere &sphere)
 {
-    // TODO: collide_ray_with_sphere is not implemented
+    const float d = disc(ray.origin, ray.dir,
+                         sphere.center,
+                         sphere.radius);
+
+    if (d >= 0.0f) {
+        return absorb_ray(ray, Color{0.0f, 0.0f, 1.0f});
+    }
+
     return void_ray(ray);
 }
 
