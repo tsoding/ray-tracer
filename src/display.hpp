@@ -16,15 +16,15 @@ class Display {
     size_t width() const;
     size_t height() const;
 
-    void put(size_t row, size_t col, const color &c);
-    color pixel(size_t row, size_t col) const;
+    void put(size_t row, size_t col, const Color &c);
+    Color pixel(size_t row, size_t col) const;
 
     void save_as_ppm(const std::string &filename) const;
 
  private:
     const size_t m_width;
     const size_t m_height;
-    color *m_data;
+    Color *m_data;
 };
 
 #endif  // DISPLAY_HPP_

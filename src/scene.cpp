@@ -46,7 +46,7 @@ const Scene load_scene_from_file(const std::string &filename) {
 
             scene.walls.push_back({
                     {plane1, plane2, plane3, plane4},
-                    hex_color != nullptr ? *hex_color : color{1.0f, 1.0f, 1.0f}
+                    hex_color != nullptr ? *hex_color : Color{1.0f, 1.0f, 1.0f}
                 });
         } else if (type == "t") {  // triangle
             Triangle t;
@@ -64,13 +64,13 @@ static float color_factor(size_t steps, size_t step_count) {
     return x;
 }
 
-color march(float x, float y,
+Color march(float x, float y,
             const Scene &scene,
             vec3<float> dir) {
     vec3<float> ray = {x, y, 0.0f};
     size_t step_count = 600;
 
-    color triangle_color = {1.0f, 0.0f, 0.0f};
+    Color triangle_color = {1.0f, 0.0f, 0.0f};
 
     for (size_t i = 0; i < step_count; ++i) {
         ray += dir;
@@ -109,12 +109,12 @@ float disc(const v3f &o, const v3f &l,  // line
     return sqr(dot(l, o - c)) - sqr(len(o - c)) + sqr(r);
 }
 
-color trace(float x, float y, const Scene &scene, const vec3<float> &dir) {
+Color trace(float x, float y, const Scene &scene, const vec3<float> &dir) {
     const vec3<float> ray = {x, y, 0.0f};
 
     bool found = false;
     vec3<float> closest_point;
-    color closest_color = {0.0f, 0.0f, 0.0f};
+    Color closest_color = {0.0f, 0.0f, 0.0f};
 
     for (size_t i = 0; i < scene.walls.size(); ++i) {
         const float b = dot(vec_pop(scene.walls[i].p), dir);
@@ -152,7 +152,7 @@ color trace(float x, float y, const Scene &scene, const vec3<float> &dir) {
                              scene.spheres[i].center,
                              scene.spheres[i].radius);
         if (d >= 0.0f) {
-            return color{0.0f, 0.0f, 1.0f};
+            return Color{0.0f, 0.0f, 1.0f};
         }
     }
 

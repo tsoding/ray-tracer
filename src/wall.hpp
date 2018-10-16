@@ -7,7 +7,7 @@ using plane = vec<float, 4>;
 
 struct Wall {
     plane p;
-    color c;
+    Color c;
 };
 
 std::ostream& operator<<(std::ostream& os, const Wall&wall);

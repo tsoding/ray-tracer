@@ -7,13 +7,13 @@
 Display::Display(size_t width, size_t height):
     m_width(width),
     m_height(height),
-    m_data(new color[width * height]) {
+    m_data(new Color[width * height]) {
 }
 
 Display::Display(const Display &display):
     m_width(display.m_width),
     m_height(display.m_height),
-    m_data(new color[m_width * m_height]) {
+    m_data(new Color[m_width * m_height]) {
     std::copy(display.m_data,
               display.m_data + m_width * m_height,
               m_data);
@@ -37,11 +37,11 @@ size_t Display::height() const {
     return m_height;
 }
 
-void Display::put(size_t row, size_t col, const color &c) {
+void Display::put(size_t row, size_t col, const Color &c) {
     m_data[row * m_width + col] = c;
 }
 
-color Display::pixel(size_t row, size_t col) const {
+Color Display::pixel(size_t row, size_t col) const {
     return m_data[row * m_width + col];
 }
 
