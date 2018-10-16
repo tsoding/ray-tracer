@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "scene.hpp"
+#include "ray.hpp"
 
 std::ostream& operator<<(std::ostream& os, const Scene&scene) {
     os << "Scene{" << std::endl
@@ -110,45 +111,40 @@ float disc(const v3f &o, const v3f &l,  // line
 }
 
 Color trace(float x, float y, const Scene &scene, const vec3<float> &dir) {
-    const vec3<float> ray = {x, y, 0.0f};
+    Ray ray = {
+       {x, y, 0.0f},
+       dir,
+       Color{1.0f, 1.0f, 1.0f},
+       false
+    };
 
-    bool found = false;
-    vec3<float> closest_point;
-    Color closest_color = {0.0f, 0.0f, 0.0f};
+    while (!ray.absorbed) {
+        Ray next_ray = void_ray(ray);
 
-    for (size_t i = 0; i < scene.walls.size(); ++i) {
-        const float b = dot(vec_pop(scene.walls[i].p), dir);
+        for (const auto &wall: scene.walls) {
+            const Ray wall_ray = collide_ray_with_wall(ray, wall);
 
-        // They ray is moving along with the plane
-        if (std::fabs(b) < 1e-6) {
-            continue;
-        }
-
-        const float a = -dot(scene.walls[i].p, vec_push(ray, 1.0f));
-        const float t = a / b;
-
-        if (t < 0.0f) {
-            continue;
-        }
-
-        if (!found) {
-            found = true;
-            closest_point = ray + t * dir;
-            closest_color = scene.walls[i].c;
-        } else {
-            const vec3<float> new_closest_point = ray + t * dir;
-            if (len(ray - new_closest_point) < len(ray - closest_point)) {
-                closest_point = new_closest_point;
-                closest_color = scene.walls[i].c;
+            if (len(ray.origin - wall_ray.origin) < len(ray.origin - next_ray.origin)) {
+                next_ray = wall_ray;
             }
         }
+
+        for (const auto &sphere: scene.spheres) {
+            const Ray sphere_ray = collide_ray_with_sphere(ray, sphere);
+
+            if (len(ray.origin - sphere_ray.origin) < len(ray.origin - next_ray.origin)) {
+                next_ray = sphere_ray;
+            }
+        }
+
+        ray = next_ray;
     }
 
     // TODO(#96): sphere is always visible even if it's behind something
     // TODO(#97): spheres do not reflect the rays
 
     for (size_t i = 0; i < scene.spheres.size(); ++i) {
-        const float d = disc(ray, dir,
+        const float d = disc(ray.origin, ray.dir,
                              scene.spheres[i].center,
                              scene.spheres[i].radius);
         if (d >= 0.0f) {
@@ -158,7 +154,6 @@ Color trace(float x, float y, const Scene &scene, const vec3<float> &dir) {
 
     // TODO(#89): trace() does not support triangles
 
-    const float max_ray_length = 600.0f;
-
-    return closest_color * (1.0f - std::min(max_ray_length, len(closest_point - ray)) / max_ray_length);
+    // TODO: shadows are broke in trace()
+    return ray.color;
 }

@@ -14,6 +14,7 @@ struct Ray
     bool absorbed;
 };
 
+Ray void_ray(const Ray &ray);
 Ray collide_ray_with_sphere(const Ray &ray, const Sphere &sphere);
 Ray collide_ray_with_wall(const Ray &ray, const Wall &wall);
 
