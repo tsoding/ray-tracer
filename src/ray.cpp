@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include "ray.hpp"
 
 const float WORLD_HORIZON_FACTOR = 10000.0f;
@@ -15,8 +17,7 @@ static float disc(const v3f &o, const v3f &l,  // line
     return sqr(dot(l, o - c)) - sqr(len(o - c)) + sqr(r);
 }
 
-Ray void_ray(const Ray &ray)
-{
+Ray void_ray(const Ray &ray) {
     return {
         ray.origin + WORLD_HORIZON_FACTOR * ray.dir,
         ray.dir,
@@ -25,8 +26,7 @@ Ray void_ray(const Ray &ray)
     };
 }
 
-Ray absorb_ray(const Ray &ray, const Color &color)
-{
+Ray absorb_ray(const Ray &ray, const Color &color) {
     return {
         ray.origin,
         ray.dir,
@@ -35,8 +35,7 @@ Ray absorb_ray(const Ray &ray, const Color &color)
     };
 }
 
-Ray collide_ray_with_sphere(const Ray &ray, const Sphere &sphere)
-{
+Ray collide_ray_with_sphere(const Ray &ray, const Sphere &sphere) {
     const float d = disc(ray.origin, ray.dir,
                          sphere.center,
                          sphere.radius);

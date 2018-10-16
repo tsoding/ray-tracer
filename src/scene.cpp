@@ -110,7 +110,7 @@ Color trace(float x, float y, const Scene &scene, const vec3<float> &dir) {
     while (!ray.absorbed) {
         Ray next_ray = void_ray(ray);
 
-        for (const auto &wall: scene.walls) {
+        for (const auto &wall : scene.walls) {
             const Ray wall_ray = collide_ray_with_wall(ray, wall);
 
             if (len(ray.origin - wall_ray.origin) < len(ray.origin - next_ray.origin)) {
@@ -118,7 +118,7 @@ Color trace(float x, float y, const Scene &scene, const vec3<float> &dir) {
             }
         }
 
-        for (const auto &sphere: scene.spheres) {
+        for (const auto &sphere : scene.spheres) {
             const Ray sphere_ray = collide_ray_with_sphere(ray, sphere);
 
             if (len(ray.origin - sphere_ray.origin) < len(ray.origin - next_ray.origin)) {

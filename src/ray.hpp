@@ -6,8 +6,7 @@
 #include "sphere.hpp"
 #include "wall.hpp"
 
-struct Ray
-{
+struct Ray {
     v3f origin;
     v3f dir;
     Color color;
