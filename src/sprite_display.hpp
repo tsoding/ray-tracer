@@ -15,7 +15,7 @@ class SpriteDisplay {
         return m_textureDisplay.height();
     }
 
-    inline void put(size_t row, size_t col, const color &c) {
+    inline void put(size_t row, size_t col, const Color &c) {
         return m_textureDisplay.put(row, col, c);
     }
 

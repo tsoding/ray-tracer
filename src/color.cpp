@@ -39,7 +39,7 @@ static bool is_color_hex_code(const std::string &str) {
     return true;
 }
 
-std::unique_ptr<color> color_from_hex(const std::string &str) {
+std::unique_ptr<Color> color_from_hex(const std::string &str) {
     if (!is_color_hex_code(str)) {
         return nullptr;
     }
@@ -47,11 +47,11 @@ std::unique_ptr<color> color_from_hex(const std::string &str) {
     std::array<int, 6> codes;
     std::transform(str.begin() + 1, str.end(), codes.begin(), digit_hex_to_dec);
 
-    const color hex_color = {
+    const Color hex_color = {
         static_cast<float>(codes[0] * 16 + codes[1]) / 255.0f,
         static_cast<float>(codes[2] * 16 + codes[3]) / 255.0f,
         static_cast<float>(codes[4] * 16 + codes[5]) / 255.0f
     };
 
-    return std::make_unique<color>(hex_color);
+    return std::make_unique<Color>(hex_color);
 }

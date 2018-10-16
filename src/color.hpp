@@ -6,8 +6,8 @@
 
 #include "./vec.hpp"
 
-using color = vec<float, 3>;
+using Color = vec<float, 3>;
 
-std::unique_ptr<color> color_from_hex(const std::string &str);
+std::unique_ptr<Color> color_from_hex(const std::string &str);
 
 #endif  // SRC_COLOR_HPP_

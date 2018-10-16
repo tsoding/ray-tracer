@@ -17,7 +17,7 @@ size_t TextureDisplay::height() const {
     return m_height;
 }
 
-void TextureDisplay::put(size_t row, size_t col, const color &c) {
+void TextureDisplay::put(size_t row, size_t col, const Color &c) {
     m_buffer[row * m_width * 4 + col * 4 + 0] = static_cast<sf::Uint8>(c.v[0] * 255.0f);
     m_buffer[row * m_width * 4 + col * 4 + 1] = static_cast<sf::Uint8>(c.v[1] * 255.0f);
     m_buffer[row * m_width * 4 + col * 4 + 2] = static_cast<sf::Uint8>(c.v[2] * 255.0f);
