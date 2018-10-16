@@ -132,6 +132,5 @@ Color trace(float x, float y, const Scene &scene, const vec3<float> &dir) {
     // TODO(#97): spheres do not reflect the rays
     // TODO(#89): trace() does not support triangles
 
-    // TODO: shadows are broke in trace()
     return ray.color;
 }

@@ -1,7 +1,8 @@
 #include "ray.hpp"
 
-const float WORLD_HORIZON_FACTOR = 10000.0;
+const float WORLD_HORIZON_FACTOR = 10000.0f;
 const Color WORLD_SKYBOX_COLOR = Color{0.0f, 0.0f, 0.0f};
+const float MAX_RAY_LENGTH = 600.0f;
 
 template <typename T>
 static T sqr(T x) {
@@ -66,7 +67,7 @@ Ray collide_ray_with_wall(const Ray &ray, const Wall &wall) {
     return {
         ray.origin + t * ray.dir,
         ray.dir,
-        wall.c,
+        wall.c * (1.0f - std::min(MAX_RAY_LENGTH, t) / MAX_RAY_LENGTH),
         true
     };
 }
