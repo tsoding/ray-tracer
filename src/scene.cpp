@@ -152,4 +152,4 @@ void render_row(const Scene &scene,
     }
 }
 
-// TODO: parallel rendering is not implemented
+// TODO(#103): parallel rendering is not implemented
