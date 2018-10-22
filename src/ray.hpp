@@ -13,6 +13,10 @@ struct Ray {
     bool absorbed;
 };
 
+inline Ray ray(const v3f &origin, const v3f &dir, const Color &color) {
+    return {origin, dir, color, false};
+}
+
 Ray void_ray(const Ray &ray);
 Ray collide_ray_with_sphere(const Ray &ray, const Sphere &sphere);
 Ray collide_ray_with_wall(const Ray &ray, const Wall &wall);
