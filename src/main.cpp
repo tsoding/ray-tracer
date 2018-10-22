@@ -51,7 +51,8 @@ void file_render_mode(const Arguments &arguments) {
 
 void preview_mode(const Arguments &arguments) {
     // TODO(#102): Preview Mode is not implemented (use SDL please)
-    assert(!"Preview Mode is not implemented");
+    std::cerr << "Preview Mode is not implemented" << std::endl;
+    exit(1);
 }
 
 int main(int argc, char *argv[]) {
