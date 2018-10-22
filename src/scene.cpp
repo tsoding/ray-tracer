@@ -104,19 +104,17 @@ Color trace(const Scene &scene, Ray ray) {
         Ray next_ray = void_ray(ray);
 
         for (const auto &wall : scene.walls) {
-            const Ray wall_ray = collide_ray_with_wall(ray, wall);
-
-            if (len(ray.origin - wall_ray.origin) < len(ray.origin - next_ray.origin)) {
-                next_ray = wall_ray;
-            }
+            next_ray = closer_ray(
+                ray,
+                collide_ray_with_wall(ray, wall),
+                next_ray);
         }
 
         for (const auto &sphere : scene.spheres) {
-            const Ray sphere_ray = collide_ray_with_sphere(ray, sphere);
-
-            if (len(ray.origin - sphere_ray.origin) < len(ray.origin - next_ray.origin)) {
-                next_ray = sphere_ray;
-            }
+            next_ray = closer_ray(
+                ray,
+                collide_ray_with_sphere(ray, sphere),
+                next_ray);
         }
 
         ray = next_ray;
