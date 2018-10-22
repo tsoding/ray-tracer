@@ -1,3 +1,5 @@
+#include <cassert>
+
 #include <algorithm>
 #include <fstream>
 #include <iostream>
@@ -65,21 +67,19 @@ static float color_factor(size_t steps, size_t step_count) {
     return x;
 }
 
-Color march(float x, float y,
-            const Scene &scene,
-            vec3<float> dir) {
-    vec3<float> ray = {x, y, 0.0f};
+Color march(const Scene &scene, Ray start_ray) {
+    vec3<float> ray = {start_ray.origin.v[0], start_ray.origin.v[1], 0.0f};
     size_t step_count = 600;
 
     Color triangle_color = {1.0f, 0.0f, 0.0f};
 
     for (size_t i = 0; i < step_count; ++i) {
-        ray += dir;
+        ray += start_ray.dir;
 
         for (const auto &sphere : scene.spheres) {
             if (is_ray_inside_of_sphere(sphere, ray)) {
                 vec3<float> norm = normalize(ray - sphere.center);
-                dir = normalize(dir - (2 * dot(dir, norm)) * norm);
+                start_ray.dir = normalize(start_ray.dir - (2 * dot(start_ray.dir, norm)) * norm);
             }
         }
 
@@ -99,14 +99,7 @@ Color march(float x, float y,
     return {0.0f, 0.0f, 0.0f};
 }
 
-Color trace(float x, float y, const Scene &scene, const vec3<float> &dir) {
-    Ray ray = {
-       {x, y, 0.0f},
-       dir,
-       Color{1.0f, 1.0f, 1.0f},
-       false
-    };
-
+Color trace(const Scene &scene, Ray ray) {
     while (!ray.absorbed) {
         Ray next_ray = void_ray(ray);
 
@@ -134,3 +127,29 @@ Color trace(float x, float y, const Scene &scene, const vec3<float> &dir) {
 
     return ray.color;
 }
+
+void render_row(const Scene &scene,
+                Display *display,
+                size_t row,
+                RenderPixel renderPixel) {
+    assert(display);
+
+    const float half_width = static_cast<float>(display->width) * 0.5f;
+    const float half_height = static_cast<float>(display->height) * 0.5f;
+
+    for (size_t col = 0; col < display->width; ++col) {
+        const vec3<float> origin = { static_cast<float>(col) - half_width,
+                                     static_cast<float>(row) - half_height,
+                                     0.0f };
+        display->put(
+            row, col,
+            renderPixel(
+                scene,
+                ray(
+                    origin,
+                    normalize(origin - scene.eye),
+                    Color{1.0f, 1.0f, 1.0f})));
+    }
+}
+
+// TODO(#103): parallel rendering is not implemented

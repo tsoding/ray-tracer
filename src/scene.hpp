@@ -3,10 +3,13 @@
 
 #include <string>
 #include <vector>
+#include <functional>
 
 #include "sphere.hpp"
 #include "wall.hpp"
 #include "triangle.hpp"
+#include "display.hpp"
+#include "ray.hpp"
 
 struct Scene {
     vec3<float> eye;
@@ -15,11 +18,16 @@ struct Scene {
     std::vector<Triangle> triangles;
 };
 
+using RenderPixel = std::function<Color(const Scene&, Ray)>;
+
 std::ostream& operator<<(std::ostream& os, const Scene&scene);
 const Scene load_scene_from_file(const std::string &filename);
-Color march(float x, float y, const Scene &scene, vec3<float> dir);
-Color trace(float x, float y,
-            const Scene &scene,
-            const vec3<float> &dir);
+Color march(const Scene &scene, Ray ray);
+Color trace(const Scene &scene, Ray ray);
+
+void render_row(const Scene &scene,
+                Display *display,
+                size_t row,
+                RenderPixel renderPixel);
 
 #endif  // SCENE_HPP_

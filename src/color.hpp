@@ -6,6 +6,7 @@
 
 #include "./vec.hpp"
 
+// TODO(#101): color poorly aligns with image formats
 using Color = vec<float, 3>;
 
 std::unique_ptr<Color> color_from_hex(const std::string &str);

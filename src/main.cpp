@@ -1,6 +1,7 @@
 #include <cmath>
 #include <cstdint>
 #include <cstring>
+#include <cassert>
 
 #include <algorithm>
 #include <array>
@@ -19,93 +20,39 @@
 #include "./arguments.hpp"
 #include "./color.hpp"
 #include "./display.hpp"
-#include "./parallel_rendering.hpp"
-#include "./progress.hpp"
-#include "./row_marching.hpp"
-#include "./row_tracing.hpp"
 #include "./scene.hpp"
-#include "./shuffled_rows.hpp"
 #include "./sphere.hpp"
-#include "./sprite_display.hpp"
 #include "./vec.hpp"
+
+template <typename T>
+void report_progress(const std::string &title,
+                     T work, T goal) {
+    const float progress =
+        static_cast<float>(work) / static_cast<float>(goal) * 100.0f;
+
+    std::cout << "\r" << title << "... "
+              << std::fixed << std::setprecision(1)
+              << progress
+              << std::left << std::setfill(' ') << std::setw(2)
+              << "%" << std::flush;
+}
 
 void file_render_mode(const Arguments &arguments) {
     Display display(arguments.width(), arguments.height());
     Scene scene = load_scene_from_file(arguments.sceneFile());
 
-    mkProgress(
-        mkParallelRendering(
-            mkRowTracing(
-                &scene,
-                &display),
-            arguments.threadCount()),
-        "Rendering").start();
+    for (size_t row = 0; row < display.height; ++row) {
+        render_row(scene, &display, row, trace);
+        report_progress("Rendering", row, display.height - 1);
+    }
 
-    display.save_as_ppm(arguments.outputFile());
+    save_as_ppm(display, arguments.outputFile());
 }
 
 void preview_mode(const Arguments &arguments) {
-    Scene scene = load_scene_from_file(arguments.sceneFile());
-    SpriteDisplay display(arguments.width(), arguments.height());
-
-    auto progress =
-        mkProgress(
-            mkParallelRendering(
-                mkShuffledRows(
-                    mkRowTracing(
-                        &scene,
-                        &display)),
-                arguments.threadCount()),
-            "Preview rendering");
-
-    sf::RenderWindow window(sf::VideoMode(static_cast<unsigned int>(arguments.width()),
-                                          static_cast<unsigned int>(arguments.height()),
-                                          32),
-                            "Ray Tracer");
-    window.setFramerateLimit(0);
-    window.setVerticalSyncEnabled(true);
-    window.clear(sf::Color(0, 0, 0));
-    window.display();
-
-    while (window.isOpen()) {
-        sf::Event event;
-        while (window.pollEvent(event)) {
-            switch (event.type) {
-            case sf::Event::Closed: {
-                window.close();
-                break;
-            }
-            case sf::Event::Resized: {
-                sf::Vector2f size = static_cast<sf::Vector2f>(window.getSize());
-                window.setView(sf::View(sf::FloatRect(0.f, 0.f, size.x, size.y)));
-                break;
-            }
-            case sf::Event::KeyPressed: {
-                switch (event.key.code) {
-                case sf::Keyboard::Q:
-                case sf::Keyboard::Escape:
-                    window.close();
-                    break;
-                case sf::Keyboard::R:
-                    scene = load_scene_from_file(arguments.sceneFile());
-                    display.clean();
-                    progress.progressReset();
-                    break;
-                default: break;
-                }
-                break;
-            }
-            default: break;
-            }
-        }
-
-        progress.report();
-        progress.progressDo();
-
-        window.clear();
-        window.draw(display.sprite());
-        window.display();
-    }
+    // TODO(#102): Preview Mode is not implemented (use SDL please)
+    std::cerr << "Preview Mode is not implemented" << std::endl;
+    exit(1);
 }
 
 int main(int argc, char *argv[]) {
