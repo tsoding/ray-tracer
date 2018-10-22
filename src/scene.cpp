@@ -1,3 +1,5 @@
+#include <cassert>
+
 #include <algorithm>
 #include <fstream>
 #include <iostream>
@@ -127,17 +129,19 @@ Color trace(const Scene &scene, Ray ray) {
 }
 
 void render_row(const Scene &scene,
-                Display &display,
+                Display *display,
                 size_t row,
                 RenderPixel renderPixel) {
-    const float half_width = static_cast<float>(display.width) * 0.5f;
-    const float half_height = static_cast<float>(display.height) * 0.5f;
+    assert(display);
 
-    for (size_t col = 0; col < display.width; ++col) {
+    const float half_width = static_cast<float>(display->width) * 0.5f;
+    const float half_height = static_cast<float>(display->height) * 0.5f;
+
+    for (size_t col = 0; col < display->width; ++col) {
         const vec3<float> origin = { static_cast<float>(col) - half_width,
                                      static_cast<float>(row) - half_height,
                                      0.0f };
-        display.put(
+        display->put(
             row, col,
             renderPixel(
                 scene,

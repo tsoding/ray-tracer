@@ -42,7 +42,7 @@ void file_render_mode(const Arguments &arguments) {
     Scene scene = load_scene_from_file(arguments.sceneFile());
 
     for (size_t row = 0; row < display.height; ++row) {
-        render_row(scene, display, row, trace);
+        render_row(scene, &display, row, trace);
         report_progress("Rendering", row, display.height - 1);
     }
 

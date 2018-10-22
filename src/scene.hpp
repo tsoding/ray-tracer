@@ -26,7 +26,7 @@ Color march(const Scene &scene, Ray ray);
 Color trace(const Scene &scene, Ray ray);
 
 void render_row(const Scene &scene,
-                Display &display,
+                Display *display,
                 size_t row,
                 RenderPixel renderPixel);
 
