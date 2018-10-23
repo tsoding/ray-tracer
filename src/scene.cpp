@@ -100,7 +100,6 @@ Color march(const Scene &scene, Ray start_ray) {
 }
 
 Color trace(const Scene &scene, Ray ray) {
-
     for (size_t i = 0; i < 10 && !ray.absorbed; ++i) {
         Ray next_ray = void_ray(ray);
 
