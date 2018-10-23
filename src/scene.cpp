@@ -100,6 +100,7 @@ Color march(const Scene &scene, Ray start_ray) {
 }
 
 Color trace(const Scene &scene, Ray ray) {
+
     for (size_t i = 0; i < 10 && !ray.absorbed; ++i) {
         Ray next_ray = void_ray(ray);
 
@@ -110,6 +111,7 @@ Color trace(const Scene &scene, Ray ray) {
                 next_ray);
         }
 
+        // TODO: rays are getting stuck inside of spheres
         for (const auto &sphere : scene.spheres) {
             next_ray = closer_ray(
                 ray,
@@ -126,7 +128,6 @@ Color trace(const Scene &scene, Ray ray) {
         // std::cout << ray.origin << "->" << ray.dir << std::endl;
     }
 
-    // TODO(#97): spheres do not reflect the rays
     // TODO(#89): trace() does not support triangles
 
     return ray.color;
