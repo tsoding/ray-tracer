@@ -132,6 +132,18 @@ Color trace(const Scene &scene, Ray ray) {
     return ray.color;
 }
 
+Color debug_sphere(const Scene &scene, Ray ray) {
+    for (const auto &sphere : scene.spheres) {
+        Ray sphere_ray = collide_ray_with_sphere(ray, sphere);
+        if (!sphere_ray.absorbed) {
+            std::cout << sphere_ray.origin << ','
+                      << 10.0f * sphere_ray.dir << std::endl;
+        }
+    }
+
+    return Color{0.0f, 0.0f, 0.0f};
+}
+
 void render_row(const Scene &scene,
                 Display *display,
                 size_t row,
