@@ -24,6 +24,7 @@ std::ostream& operator<<(std::ostream& os, const Scene&scene);
 const Scene load_scene_from_file(const std::string &filename);
 Color march(const Scene &scene, Ray ray);
 Color trace(const Scene &scene, Ray ray);
+Color debug_sphere(const Scene &scene, Ray ray);
 
 void render_row(const Scene &scene,
                 Display *display,
