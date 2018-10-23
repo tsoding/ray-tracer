@@ -111,7 +111,7 @@ Color trace(const Scene &scene, Ray ray) {
                 next_ray);
         }
 
-        // TODO: rays are getting stuck inside of spheres
+        // TODO(#105): rays are getting stuck inside of spheres
         for (const auto &sphere : scene.spheres) {
             next_ray = closer_ray(
                 ray,
