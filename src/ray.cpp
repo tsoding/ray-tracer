@@ -14,7 +14,7 @@ static T sqr(T x) {
 // https://en.wikipedia.org/wiki/Line%E2%80%93sphere_intersection
 static float disc(const v3f &o, const v3f &l,  // line
                   const v3f &c, float r) {     // sphere
-    return sqr(2.0f * dot(l, o - c)) - 4.0f * sqr(len(l)) * (sqr(len(o - c)) - sqr(r));
+    return sqr(dot(l, o - c)) - sqr(len(o - c)) + sqr(r);
 }
 
 Ray void_ray(const Ray &ray) {
@@ -47,16 +47,16 @@ Ray collide_ray_with_sphere(const Ray &ray, const Sphere &sphere) {
         return void_ray(ray);
     }
 
-    const float d1 = -2.0f * (dot(l, o - c));
-    const v3f x1 = o + ((d1 - sqrtf(d2)) / (2.0f * sqr(len(l)))) * l;
-    const v3f x2 = o + ((d1 + sqrtf(d2)) / (2.0f * sqr(len(l)))) * l;
+    const float d1 = - dot(l, o - c);
+    const v3f x1 = o + (d1 - sqrtf(d2)) * l;
+    const v3f x2 = o + (d1 + sqrtf(d2)) * l;
     const v3f x = len(o - x1) < len(o - x2) ? x1 : x2;
 
     const v3f n = normalize(x - c);
     const v3f l1 = normalize(l - (2 * dot(l, n)) * n);
 
     return {
-        x + l1 * 2.0f,
+        x,
         l1,
         ray.color,
         ray.absorbed
