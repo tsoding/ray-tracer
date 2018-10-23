@@ -13,8 +13,8 @@ static T sqr(T x) {
 
 // https://en.wikipedia.org/wiki/Line%E2%80%93sphere_intersection
 static float disc(const v3f &o, const v3f &l,  // line
-           const v3f &c, float r) {     // sphere
-    return sqr(dot(l, o - c)) - sqr(len(o - c)) + sqr(r);
+                  const v3f &c, float r) {     // sphere
+    return sqr(2.0f * dot(l, o - c)) - 4.0f * sqr(len(l)) * (sqr(len(o - c)) - sqr(r));
 }
 
 Ray void_ray(const Ray &ray) {
@@ -36,15 +36,31 @@ Ray absorb_ray(const Ray &ray, const Color &color) {
 }
 
 Ray collide_ray_with_sphere(const Ray &ray, const Sphere &sphere) {
-    const float d = disc(ray.origin, ray.dir,
-                         sphere.center,
-                         sphere.radius);
+    const v3f o = ray.origin;
+    const v3f l = ray.dir;
+    const v3f c = sphere.center;
+    const float r = sphere.radius;
 
-    if (d >= 0.0f) {
-        return absorb_ray(ray, Color{0.0f, 0.0f, 1.0f});
+    const float d2 = disc(o, l, c, r);
+
+    if (d2 <= 0.0f) {
+        return void_ray(ray);
     }
 
-    return void_ray(ray);
+    const float d1 = -2.0f * (dot(l, o - c));
+    const v3f x1 = o + ((d1 - sqrtf(d2)) / (2.0f * sqr(len(l)))) * l;
+    const v3f x2 = o + ((d1 + sqrtf(d2)) / (2.0f * sqr(len(l)))) * l;
+    const v3f x = len(o - x1) < len(o - x2) ? x1 : x2;
+
+    const v3f n = normalize(x - c);
+    const v3f l1 = normalize(l - (2 * dot(l, n)) * n);
+
+    return {
+        x + l1 * 2.0f,
+        l1,
+        ray.color,
+        ray.absorbed
+    };
 }
 
 Ray collide_ray_with_wall(const Ray &ray, const Wall &wall) {
