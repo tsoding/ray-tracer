@@ -133,7 +133,7 @@ Color trace(const Scene &scene, Ray ray) {
 }
 
 Color debug_sphere(const Scene &scene, Ray ray) {
-    for (const auto &sphere: scene.spheres) {
+    for (const auto &sphere : scene.spheres) {
         Ray sphere_ray = collide_ray_with_sphere(ray, sphere);
         if (!sphere_ray.absorbed) {
             std::cout << sphere_ray.origin << ','
