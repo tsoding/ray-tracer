@@ -17,10 +17,9 @@ using v3f = vec3<float>;
 
 template <typename T, size_t N>
 inline std::ostream& operator<<(std::ostream& os, const vec<T, N> &vec) {
-    os << "{";
     for (size_t i = 0; i < N - 1; i++)
         os << vec.v[i] << ",";
-    os << vec.v[N-1] << "}";
+    os << vec.v[N-1];
 
     return os;
 }
