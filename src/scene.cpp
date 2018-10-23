@@ -100,7 +100,7 @@ Color march(const Scene &scene, Ray start_ray) {
 }
 
 Color trace(const Scene &scene, Ray ray) {
-    while (!ray.absorbed) {
+    for (size_t i = 0; i < 10 && !ray.absorbed; ++i) {
         Ray next_ray = void_ray(ray);
 
         for (const auto &wall : scene.walls) {
@@ -115,9 +115,15 @@ Color trace(const Scene &scene, Ray ray) {
                 ray,
                 collide_ray_with_sphere(ray, sphere),
                 next_ray);
+
+            if (is_ray_inside_of_sphere(sphere, next_ray.origin)) {
+                next_ray.absorbed = true;
+                next_ray.color = Color{1.0f, 0.0f, 0.0f};
+            }
         }
 
         ray = next_ray;
+        // std::cout << ray.origin << "->" << ray.dir << std::endl;
     }
 
     // TODO(#97): spheres do not reflect the rays
